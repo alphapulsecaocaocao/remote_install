@@ -14,6 +14,12 @@ export type LatestDeliveryVersion = {
   checksumUrl: string | null;
 };
 
+export type DeliveryVersion = {
+  tagName: string;
+  archiveUrl: string;
+  htmlUrl: string;
+};
+
 type Fetcher = typeof fetch;
 
 type GitHubRelease = {
@@ -30,6 +36,7 @@ type GitHubTag = {
 };
 
 const FALLBACK_DELIVERY_TAG = "v1.17.4.fix.alpha";
+const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
   const headers: Record<string, string> = {
@@ -99,6 +106,29 @@ export async function getLatestDeliveryVersion(
   };
 }
 
+export async function getDeliveryVersions(
+  fetcher: Fetcher = fetch,
+): Promise<DeliveryVersion[]> {
+  const tagsResponse = await fetcher(
+    `https://api.github.com/repos/${DELIVERY_REPO}/tags?per_page=100`,
+    getRequestInit(),
+  );
+
+  if (!tagsResponse.ok) {
+    const configured = getConfiguredDefaultVersion();
+
+    return isListedDeliveryTag(configured.tagName)
+      ? [toDeliveryVersion(configured.tagName)]
+      : [];
+  }
+
+  return ((await tagsResponse.json()) as GitHubTag[])
+    .map((tag) => normalizeTagName(tag.name ?? ""))
+    .filter(isListedDeliveryTag)
+    .sort(compareTagsDescending)
+    .map(toDeliveryVersion);
+}
+
 function getConfiguredDefaultVersion(): LatestDeliveryVersion {
   const tagName = process.env.DELIVERY_DEFAULT_TAG ?? FALLBACK_DELIVERY_TAG;
 
@@ -120,6 +150,24 @@ function findChecksumAssetUrl(release: GitHubRelease) {
     release.assets?.find((asset) => asset.name?.endsWith(".sha256"))
       ?.browser_download_url ?? null
   );
+}
+
+function isListedDeliveryTag(tagName: string) {
+  return (
+    isValidDeliveryTag(tagName) &&
+    tagName.localeCompare(MINIMUM_LISTED_DELIVERY_TAG, undefined, {
+      numeric: true,
+      sensitivity: "base",
+    }) >= 0
+  );
+}
+
+function toDeliveryVersion(tagName: string): DeliveryVersion {
+  return {
+    tagName,
+    archiveUrl: buildTagArchiveUrl(tagName),
+    htmlUrl: `${DELIVERY_REPO_URL}/releases/tag/${tagName}`,
+  };
 }
 
 function compareTagsDescending(left: string, right: string) {
