@@ -36,7 +36,7 @@ export default async function Home() {
               1688 Autoprocurement remote installer
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-[#556258]">
-              A stable Vercel endpoint for installing the customer delivery
+              A stable HTTPS endpoint for installing the customer delivery
               build. The script downloads only from the delivery repository by
               default, keeps local secrets out of public code, and forwards
               install options to the packaged deployment scripts.
@@ -70,7 +70,7 @@ export default async function Home() {
               <ol className="mt-4 space-y-3 text-sm text-[#47534b]">
                 <li className="flex gap-3">
                   <Step value="1" />
-                  Fetch installer from Vercel.
+                  Fetch installer from this site.
                 </li>
                 <li className="flex gap-3">
                   <Step value="2" />
@@ -134,9 +134,9 @@ export default async function Home() {
 
           <div className="space-y-5">
             <InfoBlock title="Secrets">
-              Real `.env` values are never stored in this Vercel project or in
-              the public shell script. Use an existing deployment env, a local
-              `--env-file`, or a short-lived private `--env-url`.
+              `.env` values are provided as a separate download so the shell
+              script stays portable. Use an existing deployment env, a local
+              `--env-file`, or a tag-specific `--env-url`.
             </InfoBlock>
             <InfoBlock title="Verification">
               Use `--sha256` with private bundles or release checksum artifacts
@@ -211,6 +211,7 @@ function PinnedVersion({
   const { changelog, tagName } = version;
   const installCommand = `curl -LsSf ${siteUrl}/install.sh | bash -s -- --tag ${tagName} --prod`;
   const downloadUrl = `${siteUrl}/api/downloads/tags/${tagName}`;
+  const envUrl = `${downloadUrl}/env`;
   const changedTotal =
     changelog.totals.added +
     changelog.totals.modified +
@@ -232,12 +233,20 @@ function PinnedVersion({
               : ""}
           </p>
         </div>
-        <a
-          className="font-medium text-[#096b4d] underline underline-offset-4"
-          href={downloadUrl}
-        >
-          Download archive
-        </a>
+        <div className="flex flex-wrap gap-3 text-sm">
+          <a
+            className="font-medium text-[#096b4d] underline underline-offset-4"
+            href={downloadUrl}
+          >
+            Download archive
+          </a>
+          <a
+            className="font-medium text-[#096b4d] underline underline-offset-4"
+            href={envUrl}
+          >
+            Download .env
+          </a>
+        </div>
       </div>
       <pre className="overflow-x-auto px-4 py-4 font-mono text-sm leading-7 text-[#17231d]">
         <code>{installCommand}</code>
