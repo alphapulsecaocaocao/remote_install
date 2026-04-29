@@ -5,7 +5,7 @@ import {
   DELIVERY_REPO,
   DELIVERY_REPO_URL,
 } from "@/lib/delivery-repo";
-import { getLatestDeliveryVersion } from "@/lib/releases";
+import { getDeliveryVersions, getLatestDeliveryVersion } from "@/lib/releases";
 
 type Command = {
   label: string;
@@ -15,7 +15,10 @@ type Command = {
 export default async function Home() {
   const siteUrl = await getRequestOrigin();
   const commands = buildCommands(siteUrl);
-  const latest = await getLatestDeliveryVersion().catch(() => null);
+  const [latest, versions] = await Promise.all([
+    getLatestDeliveryVersion().catch(() => null),
+    getDeliveryVersions().catch(() => []),
+  ]);
 
   return (
     <main className="min-h-screen bg-[#f7f6f1] text-[#1d2520]">
@@ -90,6 +93,39 @@ export default async function Home() {
                 <CommandBlock key={item.label} {...item} />
               ))}
             </div>
+            <div className="mt-8">
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <h3 className="text-xl font-semibold text-[#17231d]">
+                    Pinned versions
+                  </h3>
+                  <p className="mt-1 text-sm text-[#647068]">
+                    Available delivery tags from v1.15.1 onward.
+                  </p>
+                </div>
+                <a
+                  className="font-medium text-[#096b4d] underline underline-offset-4"
+                  href={`${siteUrl}/api/downloads/latest`}
+                >
+                  Download latest
+                </a>
+              </div>
+              <div className="mt-4 space-y-3">
+                {versions.length > 0 ? (
+                  versions.map((version) => (
+                    <PinnedVersion
+                      key={version.tagName}
+                      siteUrl={siteUrl}
+                      tagName={version.tagName}
+                    />
+                  ))
+                ) : (
+                  <div className="border border-[#d6cebd] bg-white px-4 py-4 text-sm text-[#556258]">
+                    No pinned versions are available right now.
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="space-y-5">
@@ -155,14 +191,40 @@ function buildCommands(siteUrl: string): Command[] {
       command: `curl -LsSf ${siteUrl}/install.sh | bash -s -- --prod`,
     },
     {
-      label: "Pinned",
-      command: `curl -LsSf ${siteUrl}/install.sh | bash -s -- --tag v1.15.1 --prod`,
-    },
-    {
       label: "Custom directory",
       command: `curl -LsSf ${siteUrl}/install.sh | bash -s -- --dir ${DEFAULT_INSTALL_ROOT} --tag v1.15.1 --prod`,
     },
   ];
+}
+
+function PinnedVersion({
+  siteUrl,
+  tagName,
+}: {
+  siteUrl: string;
+  tagName: string;
+}) {
+  const installCommand = `curl -LsSf ${siteUrl}/install.sh | bash -s -- --tag ${tagName} --prod`;
+  const downloadUrl = `${siteUrl}/api/downloads/tags/${tagName}`;
+
+  return (
+    <div className="border border-[#d6cebd] bg-white">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#eee8dc] px-4 py-3">
+        <p className="font-mono text-sm font-medium text-[#17231d]">
+          {tagName}
+        </p>
+        <a
+          className="font-medium text-[#096b4d] underline underline-offset-4"
+          href={downloadUrl}
+        >
+          Download archive
+        </a>
+      </div>
+      <pre className="overflow-x-auto px-4 py-4 font-mono text-sm leading-7 text-[#17231d]">
+        <code>{installCommand}</code>
+      </pre>
+    </div>
+  );
 }
 
 function Metric({

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { getLatestDeliveryVersion } from "./releases";
+import { getDeliveryVersions, getLatestDeliveryVersion } from "./releases";
 
 describe("getLatestDeliveryVersion", () => {
   it("uses the delivery repository latest release when GitHub releases exist", async () => {
@@ -65,6 +65,40 @@ describe("getLatestDeliveryVersion", () => {
       tagName: "v1.17.4.fix.alpha",
       archiveUrl:
         "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.17.4.fix.alpha",
+    });
+  });
+});
+
+describe("getDeliveryVersions", () => {
+  it("lists valid delivery tags from v1.15.1 onward in newest-first order", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: async () => [
+        { name: "v1.17.4.fix.alpha" },
+        { name: "v1.9.0" },
+        { name: "v1.15.1" },
+        { name: "v1.14.9" },
+        { name: "bad tag" },
+        { name: "v1.16.0" },
+      ],
+    });
+
+    const versions = await getDeliveryVersions(fetchMock as typeof fetch);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.github.com/repos/yueyue27418/1688-autoprocurement/tags?per_page=100",
+      expect.any(Object),
+    );
+    expect(versions.map((version) => version.tagName)).toEqual([
+      "v1.17.4.fix.alpha",
+      "v1.16.0",
+      "v1.15.1",
+    ]);
+    expect(versions[0]).toMatchObject({
+      archiveUrl:
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.17.4.fix.alpha",
+      htmlUrl:
+        "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.17.4.fix.alpha",
     });
   });
 });
