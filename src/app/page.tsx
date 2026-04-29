@@ -134,9 +134,9 @@ export default async function Home() {
 
           <div className="space-y-5">
             <InfoBlock title="Secrets">
-              `.env` values are provided as a separate download so the shell
-              script stays portable. Use an existing deployment env, a local
-              `--env-file`, or a tag-specific `--env-url`.
+              The installer preserves an existing deployment env, otherwise it
+              downloads the tag-specific `.env` from this service. Use
+              `--env-file` or `--env-url` to override it.
             </InfoBlock>
             <InfoBlock title="Verification">
               Use `--sha256` with private bundles or release checksum artifacts
