@@ -5,7 +5,11 @@ import {
   DELIVERY_REPO,
   DELIVERY_REPO_URL,
 } from "@/lib/delivery-repo";
-import { getDeliveryVersions, getLatestDeliveryVersion } from "@/lib/releases";
+import {
+  type DeliveryVersion,
+  getDeliveryVersions,
+  getLatestDeliveryVersion,
+} from "@/lib/releases";
 
 type Command = {
   label: string;
@@ -116,7 +120,7 @@ export default async function Home() {
                     <PinnedVersion
                       key={version.tagName}
                       siteUrl={siteUrl}
-                      tagName={version.tagName}
+                      version={version}
                     />
                   ))
                 ) : (
@@ -199,20 +203,35 @@ function buildCommands(siteUrl: string): Command[] {
 
 function PinnedVersion({
   siteUrl,
-  tagName,
+  version,
 }: {
   siteUrl: string;
-  tagName: string;
+  version: DeliveryVersion;
 }) {
+  const { changelog, tagName } = version;
   const installCommand = `curl -LsSf ${siteUrl}/install.sh | bash -s -- --tag ${tagName} --prod`;
   const downloadUrl = `${siteUrl}/api/downloads/tags/${tagName}`;
+  const changedTotal =
+    changelog.totals.added +
+    changelog.totals.modified +
+    changelog.totals.removed;
 
   return (
     <div className="border border-[#d6cebd] bg-white">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#eee8dc] px-4 py-3">
-        <p className="font-mono text-sm font-medium text-[#17231d]">
-          {tagName}
-        </p>
+        <div>
+          <p className="font-mono text-sm font-medium text-[#17231d]">
+            {tagName}
+          </p>
+          <p className="mt-1 text-xs text-[#667065]">
+            {changelog.previousTagName
+              ? `Changes since ${changelog.previousTagName}`
+              : "Baseline listed delivery snapshot"}
+            {changelog.releasedAt
+              ? ` - ${formatDate(changelog.releasedAt)}`
+              : ""}
+          </p>
+        </div>
         <a
           className="font-medium text-[#096b4d] underline underline-offset-4"
           href={downloadUrl}
@@ -223,8 +242,60 @@ function PinnedVersion({
       <pre className="overflow-x-auto px-4 py-4 font-mono text-sm leading-7 text-[#17231d]">
         <code>{installCommand}</code>
       </pre>
+      <div className="border-t border-[#eee8dc] px-4 py-4">
+        <div className="grid gap-3 sm:grid-cols-4">
+          <ChangeMetric label="changed" value={changedTotal} />
+          <ChangeMetric label="added" value={changelog.totals.added} />
+          <ChangeMetric label="updated" value={changelog.totals.modified} />
+          <ChangeMetric label="removed" value={changelog.totals.removed} />
+        </div>
+        <details className="mt-4 border-t border-[#eee8dc] pt-4">
+          <summary className="cursor-pointer text-sm font-semibold text-[#17231d]">
+            Change log
+            {changelog.sourceCommit ? (
+              <span className="ml-2 font-mono text-xs font-normal text-[#667065]">
+                source {changelog.sourceCommit.slice(0, 12)}
+              </span>
+            ) : null}
+          </summary>
+          <div className="mt-4 space-y-4">
+            {changelog.sections.map((section) => (
+              <section key={section.title}>
+                <h4 className="text-sm font-semibold text-[#39443d]">
+                  {section.title}
+                </h4>
+                <ul className="mt-2 space-y-1 text-sm leading-6 text-[#556258]">
+                  {section.items.map((item) => (
+                    <li key={item} className="break-words">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
+        </details>
+      </div>
     </div>
   );
+}
+
+function ChangeMetric({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="border border-[#eee8dc] bg-[#fffdf8] px-3 py-2">
+      <p className="text-xs font-medium uppercase text-[#667065]">{label}</p>
+      <p className="mt-1 font-mono text-lg font-semibold text-[#17231d]">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("en", {
+    dateStyle: "medium",
+    timeZone: "UTC",
+  }).format(new Date(value));
 }
 
 function Metric({
