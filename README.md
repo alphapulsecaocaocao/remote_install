@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 1688 Autoprocurement Remote Install
 
-## Getting Started
+Vercel-hosted installer landing page and shell script endpoint for the customer delivery repository:
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```text
+yueyue27418/1688-autoprocurement
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+pnpm dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open `http://localhost:3000`.
 
-## Learn More
+## Smoke Tests
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm lint
+pnpm test
+pnpm build
+curl -LsSf http://localhost:3000/install.sh | bash -s -- --help
+curl -LsSf http://localhost:3000/install.sh | bash -s -- --dry-run --tag v1.15.1 --prod
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Deploy the project root to Vercel. The public production URL becomes the stable customer command source:
 
-## Deploy on Vercel
+```bash
+curl -LsSf https://<vercel-domain>/install.sh | bash
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Set these Vercel environment variables when a stable domain is assigned:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```text
+NEXT_PUBLIC_SITE_URL=https://<vercel-domain>
+DELIVERY_DEFAULT_TAG=v1.17.4.fix.alpha
+```
+
+`GITHUB_TOKEN` is optional. Provide it only if the delivery repository metadata must be read through the GitHub REST API.
+
+Do not store customer `.env` values in this project, in Vercel environment variables, or in the public shell script.
