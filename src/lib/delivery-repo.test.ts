@@ -27,7 +27,7 @@ describe("delivery repo helpers", () => {
 
   it("builds tag archive URLs from the delivery repository only", () => {
     expect(buildTagArchiveUrl("v1.15.1")).toBe(
-      "https://github.com/yueyue27418/1688-autoprocurement/archive/refs/tags/v1.15.1.tar.gz",
+      "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.15.1",
     );
   });
 });

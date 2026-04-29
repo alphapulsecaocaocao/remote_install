@@ -30,16 +30,24 @@ curl -LsSf http://localhost:3000/install.sh | bash -s -- --dry-run --tag v1.15.1
 Deploy the project root to Vercel. The public production URL becomes the stable customer command source:
 
 ```bash
-curl -LsSf https://<vercel-domain>/install.sh | bash
+curl -LsSf https://1688autoprocurement.xleeelx.online/install.sh | bash
 ```
 
-Set these Vercel environment variables when a stable domain is assigned:
+The app relays private GitHub archives through public download endpoints so customers never need GitHub repository access:
+
+```bash
+curl -L https://1688autoprocurement.xleeelx.online/api/downloads/latest -o delivery.tar.gz
+curl -L https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.15.1 -o delivery.tar.gz
+```
+
+Set these Vercel environment variables:
 
 ```text
-NEXT_PUBLIC_SITE_URL=https://<vercel-domain>
+NEXT_PUBLIC_SITE_URL=https://1688autoprocurement.xleeelx.online
 DELIVERY_DEFAULT_TAG=v1.17.4.fix.alpha
+GITHUB_TOKEN=<repo read token>
 ```
 
-`GITHUB_TOKEN` is optional. Provide it only if the delivery repository metadata must be read through the GitHub REST API.
+`GITHUB_TOKEN` is required when the delivery repository is private. It is used only server-side to resolve metadata and stream private tag archives through `/api/downloads/*`.
 
 Do not store customer `.env` values in this project, in Vercel environment variables, or in the public shell script.
