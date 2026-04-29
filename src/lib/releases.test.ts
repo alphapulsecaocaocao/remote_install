@@ -175,20 +175,28 @@ describe("getDeliveryVersions", () => {
     });
     expect(versions[0]?.changelog.sections).toEqual([
       {
-        title: "Automation server",
-        items: ["Updated automation/internal/server.ts"],
+        title: "改进",
+        items: [
+          "优化交付快照内容，按业务能力整理版本变化，避免在页面中暴露内部文件路径。",
+        ],
+      },
+    ]);
+    expect(JSON.stringify(versions[0]?.changelog.sections)).not.toContain(
+      "automation/",
+    );
+    expect(versions[2]?.changelog.sections).toEqual([
+      {
+        title: "新增",
+        items: [
+          "建立 1688 自动采购交付基线，包含搜索、标准化、文档抽取、chatbot 和自动化运行时主体能力。",
+          "提供基础安装脚本、部署文档和运行配置样例，作为后续交付版本的起点。",
+        ],
       },
       {
-        title: "Chatbot",
-        items: ["Added chatbot/src/chat-worker.js"],
-      },
-      {
-        title: "Deployment scripts",
-        items: ["Updated scripts/install.sh"],
-      },
-      {
-        title: "Removed files",
-        items: ["Removed markitdown/legacy.py"],
+        title: "运维 / 配置",
+        items: [
+          "包含首个可列出的 delivery snapshot，后续版本均以此为兼容性对比基线。",
+        ],
       },
     ]);
   });
