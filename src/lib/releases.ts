@@ -92,53 +92,50 @@ function getRequestInit() {
 export async function getLatestDeliveryVersion(
   fetcher: Fetcher = fetch,
 ): Promise<LatestDeliveryVersion> {
-  const releaseResponse = await fetcher(
+  const [releaseResponse, tagsResponse] = await Promise.all([
+    fetcher(
     `https://api.github.com/repos/${DELIVERY_REPO}/releases/latest`,
     getRequestInit(),
-  );
+    ),
+    fetcher(
+      `https://api.github.com/repos/${DELIVERY_REPO}/tags?per_page=100`,
+      getRequestInit(),
+    ),
+  ]);
+
+  const tags = tagsResponse.ok
+    ? ((await tagsResponse.json()) as GitHubTag[])
+        .map((tag) => normalizeTagName(tag.name ?? ""))
+        .filter(isValidDeliveryTag)
+        .sort(compareTagsDescending)
+    : [];
+  const latestTagName = tags[0] ?? null;
+  let releaseVersion: LatestDeliveryVersion | null = null;
 
   if (releaseResponse.ok) {
     const release = (await releaseResponse.json()) as GitHubRelease;
-    const tagName = normalizeTagName(release.tag_name ?? "");
+    const releaseTagName = normalizeTagName(release.tag_name ?? "");
 
-    if (isValidDeliveryTag(tagName)) {
-      return {
+    if (isValidDeliveryTag(releaseTagName)) {
+      releaseVersion = {
         source: "release",
-        tagName,
-        archiveUrl: buildTagArchiveUrl(tagName),
-        htmlUrl: release.html_url ?? `${DELIVERY_REPO_URL}/releases/tag/${tagName}`,
+        tagName: releaseTagName,
+        archiveUrl: buildTagArchiveUrl(releaseTagName),
+        htmlUrl:
+          release.html_url ??
+          `${DELIVERY_REPO_URL}/releases/tag/${releaseTagName}`,
         checksumUrl: findChecksumAssetUrl(release),
       };
     }
   }
 
-  const tagsResponse = await fetcher(
-    `https://api.github.com/repos/${DELIVERY_REPO}/tags?per_page=100`,
-    getRequestInit(),
-  );
-
-  if (!tagsResponse.ok) {
-    return getConfiguredDefaultVersion();
+  if (latestTagName) {
+    return releaseVersion?.tagName === latestTagName
+      ? releaseVersion
+      : toLatestTagVersion(latestTagName);
   }
 
-  const tags = ((await tagsResponse.json()) as GitHubTag[])
-    .map((tag) => normalizeTagName(tag.name ?? ""))
-    .filter(isValidDeliveryTag)
-    .sort(compareTagsDescending);
-
-  const tagName = tags[0];
-
-  if (!tagName) {
-    return getConfiguredDefaultVersion();
-  }
-
-  return {
-    source: "tag",
-    tagName,
-    archiveUrl: buildTagArchiveUrl(tagName),
-    htmlUrl: `${DELIVERY_REPO_URL}/releases/tag/${tagName}`,
-    checksumUrl: null,
-  };
+  return releaseVersion ?? getConfiguredDefaultVersion();
 }
 
 export async function getDeliveryVersions(
@@ -199,6 +196,16 @@ function getConfiguredDefaultVersion(): LatestDeliveryVersion {
 
   return {
     source: "configured",
+    tagName,
+    archiveUrl: buildTagArchiveUrl(tagName),
+    htmlUrl: `${DELIVERY_REPO_URL}/releases/tag/${tagName}`,
+    checksumUrl: null,
+  };
+}
+
+function toLatestTagVersion(tagName: string): LatestDeliveryVersion {
+  return {
+    source: "tag",
     tagName,
     archiveUrl: buildTagArchiveUrl(tagName),
     htmlUrl: `${DELIVERY_REPO_URL}/releases/tag/${tagName}`,

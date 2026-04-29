@@ -126,6 +126,13 @@ build_archive_url() {
   printf '%s\n' "${INSTALL_SERVICE_URL}/api/downloads/tags/$(normalize_tag "$tag_name")"
 }
 
+build_env_url() {
+  local tag_name="$1"
+
+  validate_tag "$tag_name" || die "Invalid delivery tag: $tag_name"
+  printf '%s\n' "${INSTALL_SERVICE_URL}/api/downloads/tags/$(normalize_tag "$tag_name")/env"
+}
+
 checksum_file() {
   local file_path="$1"
   local expected="$2"
@@ -250,6 +257,10 @@ if [[ -z "$BUNDLE_URL" ]]; then
   BUNDLE_URL="$(build_archive_url "$TAG")"
 fi
 
+if [[ -z "$ENV_URL" && -z "$ENV_FILE" && "$TAG" != "latest" ]]; then
+  ENV_URL="$(build_env_url "$TAG")"
+fi
+
 release_name="${TAG:-bundle}"
 release_name="${release_name//[^A-Za-z0-9._-]/-}"
 if [[ "$release_name" == "latest" || -z "$release_name" ]]; then
@@ -275,11 +286,13 @@ installer_args=()
 log "Delivery repository: ${DELIVERY_REPO}"
 log "Install root: ${INSTALL_DIR}"
 log "Archive URL: ${BUNDLE_URL}"
+[[ -n "$ENV_URL" ]] && log "Env URL: ${ENV_URL}"
 log "Release directory: ${RELEASE_DIR}"
 
 if [[ "$DRY_RUN" -eq 1 ]]; then
   run_cmd mkdir -p "$RELEASES_DIR" "$SHARED_DIR"
   run_cmd curl -fL "$BUNDLE_URL" -o "<temp>/delivery.tar.gz"
+  [[ -n "$ENV_URL" ]] && run_cmd curl -fsSL "$ENV_URL" -o "${SHARED_DIR}/.env"
   [[ -n "$SHA256_VALUE" ]] && log "Would verify SHA-256: ${SHA256_VALUE}"
   printf '[remote-install] DRY-RUN: bash scripts/install.sh'
   printf ' %q' "${installer_args[@]}"
