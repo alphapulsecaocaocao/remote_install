@@ -117,6 +117,12 @@ export default async function Home() {
                   Open latest delivery version
                 </a>
               ) : null}
+              <a
+                className="mt-2 block font-medium text-[#096b4d] underline underline-offset-4"
+                href={`${siteUrl}/api/downloads/latest`}
+              >
+                Download latest archive
+              </a>
             </InfoBlock>
           </div>
         </div>
@@ -131,7 +137,7 @@ async function getRequestOrigin() {
     requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
 
   if (!host) {
-    return "https://<vercel-domain>";
+    return "https://1688autoprocurement.xleeelx.online";
   }
 
   const protocol = requestHeaders.get("x-forwarded-proto") ?? "https";

@@ -24,12 +24,22 @@ export function buildTagArchiveUrl(tagName: string) {
     throw new Error(`Invalid delivery tag: ${tagName}`);
   }
 
-  return `${DELIVERY_REPO_URL}/archive/refs/tags/${normalizedTag}.tar.gz`;
+  return `${getSiteUrl()}/api/downloads/tags/${normalizedTag}`;
+}
+
+export function buildGitHubTagArchiveUrl(tagName: string) {
+  const normalizedTag = normalizeTagName(tagName);
+
+  if (!isValidDeliveryTag(normalizedTag)) {
+    throw new Error(`Invalid delivery tag: ${tagName}`);
+  }
+
+  return `https://api.github.com/repos/${DELIVERY_REPO}/tarball/${normalizedTag}`;
 }
 
 export function getSiteUrl() {
   return (
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-    "https://<vercel-domain>"
+    "https://1688autoprocurement.xleeelx.online"
   );
 }

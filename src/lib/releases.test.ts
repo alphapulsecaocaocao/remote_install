@@ -23,7 +23,7 @@ describe("getLatestDeliveryVersion", () => {
       source: "release",
       tagName: "v1.15.1",
       archiveUrl:
-        "https://github.com/yueyue27418/1688-autoprocurement/archive/refs/tags/v1.15.1.tar.gz",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.15.1",
     });
   });
 
@@ -64,7 +64,7 @@ describe("getLatestDeliveryVersion", () => {
       source: "configured",
       tagName: "v1.17.4.fix.alpha",
       archiveUrl:
-        "https://github.com/yueyue27418/1688-autoprocurement/archive/refs/tags/v1.17.4.fix.alpha.tar.gz",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.17.4.fix.alpha",
     });
   });
 });

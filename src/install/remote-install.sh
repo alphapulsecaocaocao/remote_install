@@ -26,7 +26,7 @@ PREVIOUS_CURRENT=""
 usage() {
   cat <<'EOF'
 Usage:
-  curl -LsSf https://<vercel-domain>/install.sh | bash -s -- [options]
+  curl -LsSf https://1688autoprocurement.xleeelx.online/install.sh | bash -s -- [options]
 
 Options:
   --dir PATH              Install root. Defaults to /opt/1688-autoprocurement for root, otherwise $HOME/1688-autoprocurement.
@@ -123,7 +123,7 @@ build_archive_url() {
   local tag_name="$1"
 
   validate_tag "$tag_name" || die "Invalid delivery tag: $tag_name"
-  printf '%s\n' "${DELIVERY_REPO_URL}/archive/refs/tags/$(normalize_tag "$tag_name").tar.gz"
+  printf '%s\n' "${INSTALL_SERVICE_URL}/api/downloads/tags/$(normalize_tag "$tag_name")"
 }
 
 checksum_file() {
