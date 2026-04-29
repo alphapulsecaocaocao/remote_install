@@ -51,7 +51,7 @@ export default async function Home() {
                 </span>
               </div>
               <pre className="overflow-x-auto p-5 font-mono text-sm leading-7 text-[#eaf5ed]">
-                <code>{commands[1].command}</code>
+                <code>{commands[0].command}</code>
               </pre>
             </div>
           </div>
