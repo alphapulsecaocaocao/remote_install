@@ -14,7 +14,6 @@ SHA256_VALUE=""
 ENV_URL=""
 ENV_URL_EXPLICIT=0
 ENV_FILE=""
-EMBEDDED_ENV_AVAILABLE="__DELIVERY_ENV_AVAILABLE__"
 PROD_MODE=0
 NO_START=0
 WITH_PYTHON=0
@@ -104,10 +103,6 @@ validate_url() {
   return 1
 }
 
-has_embedded_env() {
-  [[ "$EMBEDDED_ENV_AVAILABLE" == "1" ]]
-}
-
 default_install_dir() {
   if [[ "${EUID}" -eq 0 ]]; then
     printf '%s\n' "/opt/1688-autoprocurement"
@@ -139,22 +134,13 @@ build_env_url() {
   printf '%s\n' "${INSTALL_SERVICE_URL}/api/downloads/tags/$(normalize_tag "$tag_name")/env"
 }
 
-write_embedded_env_file() {
-  local target="$1"
-
-  cat > "$target" <<'__REMOTE_INSTALL_EMBEDDED_ENV__'
-__DELIVERY_ENV_CONTENT__
-__REMOTE_INSTALL_EMBEDDED_ENV__
-  chmod 600 "$target"
-}
-
 download_env_file() {
   local url="$1"
   local target="$2"
 
   if ! curl -fsSL "$url" -o "$target"; then
     rm -f "$target"
-    die "Unable to download .env from ${url}. Configure DELIVERY_ENV_FILE_CONTENT on the install service or pass --env-file."
+    die "Unable to download .env from ${url}. Check the install service env endpoint or pass --env-file."
   fi
 
   chmod 600 "$target"
@@ -318,8 +304,6 @@ if [[ -n "$ENV_FILE" ]]; then
   log "Env file: ${ENV_FILE}"
 elif [[ "$ENV_URL_EXPLICIT" -eq 1 ]]; then
   log "Env URL: ${ENV_URL}"
-elif has_embedded_env; then
-  log "Env source: embedded install.sh"
 elif [[ -n "$ENV_URL" ]]; then
   log "Env URL: ${ENV_URL}"
 fi
@@ -332,8 +316,6 @@ if [[ "$DRY_RUN" -eq 1 ]]; then
     run_cmd cp "$ENV_FILE" "${SHARED_DIR}/.env"
   elif [[ "$ENV_URL_EXPLICIT" -eq 1 ]]; then
     run_cmd curl -fsSL "$ENV_URL" -o "${SHARED_DIR}/.env"
-  elif has_embedded_env; then
-    run_cmd install -m 600 "<embedded .env>" "${SHARED_DIR}/.env"
   elif [[ -n "$ENV_URL" ]]; then
     run_cmd curl -fsSL "$ENV_URL" -o "${SHARED_DIR}/.env"
   fi
@@ -382,8 +364,6 @@ if [[ ! -f "${SHARED_DIR}/.env" ]]; then
     chmod 600 "${SHARED_DIR}/.env"
   elif [[ "$ENV_URL_EXPLICIT" -eq 1 ]]; then
     download_env_file "$ENV_URL" "${SHARED_DIR}/.env"
-  elif has_embedded_env; then
-    write_embedded_env_file "${SHARED_DIR}/.env"
   elif [[ -n "$ENV_URL" ]]; then
     download_env_file "$ENV_URL" "${SHARED_DIR}/.env"
   fi

@@ -41,7 +41,7 @@ curl -L https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.15.1 -o
 curl -L https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.15.1/env -o .env
 ```
 
-The hosted `install.sh` resolves the delivery tag first, then writes the service-configured `.env` embedded in the generated script when the install root does not already have a shared env file. If no embedded env is configured, it falls back to downloading `/api/downloads/tags/<tag>/env`. Pass `--env-file` or `--env-url` to override that default source.
+The hosted `install.sh` resolves the delivery tag first, then downloads the matching `.env` from `/api/downloads/tags/<tag>/env` when the install root does not already have a shared env file. Pass `--env-file` or `--env-url` to override that default source.
 
 Set these hosting environment variables:
 
@@ -49,9 +49,6 @@ Set these hosting environment variables:
 NEXT_PUBLIC_SITE_URL=https://1688autoprocurement.xleeelx.online
 DELIVERY_DEFAULT_TAG=v1.17.4.fix.alpha
 GITHUB_TOKEN=<repo read token>
-DELIVERY_ENV_FILE_CONTENT=<customer .env content>
 ```
 
 `GITHUB_TOKEN` is required when the delivery repository is private. It is used only server-side to resolve metadata and stream private tag archives through `/api/downloads/*`.
-
-For local development, `DELIVERY_ENV_FILE_PATH` can point at `/Users/damien/git/Github/alphapulsecaocaocao/1688-autoprocurement-pulse/.env`. Hosted deployments should use `DELIVERY_ENV_FILE_CONTENT` because local filesystem paths are not available there.

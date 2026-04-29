@@ -135,9 +135,8 @@ export default async function Home() {
           <div className="space-y-5">
             <InfoBlock title="Secrets">
               The installer preserves an existing deployment env, otherwise it
-              writes the `.env` embedded by this service or downloads the
-              tag-specific fallback. Use `--env-file` or `--env-url` to
-              override it.
+              downloads the tag-specific `.env` from this service. Use
+              `--env-file` or `--env-url` to override it.
             </InfoBlock>
             <InfoBlock title="Verification">
               Use `--sha256` with private bundles or release checksum artifacts

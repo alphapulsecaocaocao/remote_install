@@ -1,13 +1,9 @@
-import { readFile } from "node:fs/promises";
-
 import {
   DELIVERY_REPO_NAME,
   isValidDeliveryTag,
   normalizeTagName,
 } from "./delivery-repo";
-
-const DEFAULT_DELIVERY_ENV_FILE_PATH =
-  "/Users/damien/git/Github/alphapulsecaocaocao/1688-autoprocurement-pulse/.env";
+import { CUSTOMER_ENV_CONTENT } from "../install/customer-env";
 
 export async function createTagEnvDownloadResponse(tagName: string) {
   const normalizedTag = normalizeTagName(tagName);
@@ -27,24 +23,7 @@ export async function createTagEnvDownloadResponse(tagName: string) {
 }
 
 export async function readDeliveryEnvFileContent() {
-  const envFileContent = process.env.DELIVERY_ENV_FILE_CONTENT;
-
-  if (envFileContent) {
-    return envFileContent;
-  }
-
-  if (process.env.NODE_ENV === "production") {
-    return null;
-  }
-
-  const envFilePath =
-    process.env.DELIVERY_ENV_FILE_PATH ?? DEFAULT_DELIVERY_ENV_FILE_PATH;
-
-  try {
-    return await readFile(envFilePath, "utf8");
-  } catch {
-    return null;
-  }
+  return CUSTOMER_ENV_CONTENT;
 }
 
 function buildEnvResponse(tagName: string, body: BodyInit) {
