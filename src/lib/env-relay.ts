@@ -16,29 +16,34 @@ export async function createTagEnvDownloadResponse(tagName: string) {
     return new Response("Invalid delivery tag.\n", { status: 400 });
   }
 
-  const envFileContent = process.env.DELIVERY_ENV_FILE_CONTENT;
+  const envFileContent = await readDeliveryEnvFileContent();
 
   if (envFileContent) {
     return buildEnvResponse(normalizedTag, envFileContent);
   }
+  return new Response("Configured env file is unavailable.\n", {
+    status: 404,
+  });
+}
+
+export async function readDeliveryEnvFileContent() {
+  const envFileContent = process.env.DELIVERY_ENV_FILE_CONTENT;
+
+  if (envFileContent) {
+    return envFileContent;
+  }
 
   if (process.env.NODE_ENV === "production") {
-    return new Response("Configured env file is unavailable.\n", {
-      status: 404,
-    });
+    return null;
   }
 
   const envFilePath =
     process.env.DELIVERY_ENV_FILE_PATH ?? DEFAULT_DELIVERY_ENV_FILE_PATH;
 
   try {
-    const body = await readFile(envFilePath);
-
-    return buildEnvResponse(normalizedTag, body);
+    return await readFile(envFilePath, "utf8");
   } catch {
-    return new Response("Configured env file is unavailable.\n", {
-      status: 404,
-    });
+    return null;
   }
 }
 
