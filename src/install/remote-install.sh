@@ -290,12 +290,19 @@ if [[ -e "$RELEASE_DIR" ]]; then
 fi
 
 installer_args=()
-[[ "$PROD_MODE" -eq 1 ]] && installer_args+=(--prod)
-[[ "$NO_START" -eq 1 ]] && installer_args+=(--no-start)
-[[ "$WITH_PYTHON" -eq 1 ]] && installer_args+=(--with-python)
-[[ "$WITH_PLAYWRIGHT" -eq 1 ]] && installer_args+=(--with-playwright)
-[[ "$RESET_DB" -eq 1 ]] && installer_args+=(--reset-db)
-[[ "$DRY_RUN" -eq 1 ]] && installer_args+=(--dry-run)
+installer_args_count=0
+
+add_installer_arg() {
+  installer_args+=("$1")
+  installer_args_count=$((installer_args_count + 1))
+}
+
+[[ "$PROD_MODE" -eq 1 ]] && add_installer_arg --prod
+[[ "$NO_START" -eq 1 ]] && add_installer_arg --no-start
+[[ "$WITH_PYTHON" -eq 1 ]] && add_installer_arg --with-python
+[[ "$WITH_PLAYWRIGHT" -eq 1 ]] && add_installer_arg --with-playwright
+[[ "$RESET_DB" -eq 1 ]] && add_installer_arg --reset-db
+[[ "$DRY_RUN" -eq 1 ]] && add_installer_arg --dry-run
 
 log "Delivery repository: ${DELIVERY_REPO}"
 log "Install root: ${INSTALL_DIR}"
@@ -321,7 +328,9 @@ if [[ "$DRY_RUN" -eq 1 ]]; then
   fi
   [[ -n "$SHA256_VALUE" ]] && log "Would verify SHA-256: ${SHA256_VALUE}"
   printf '[remote-install] DRY-RUN: bash scripts/install.sh'
-  printf ' %q' "${installer_args[@]}"
+  if [[ "$installer_args_count" -gt 0 ]]; then
+    printf ' %q' "${installer_args[@]}"
+  fi
   printf '\n'
   exit 0
 fi
@@ -387,7 +396,11 @@ CURRENT_UPDATED=1
 
 (
   cd "$RELEASE_DIR"
-  bash scripts/install.sh "${installer_args[@]}"
+  if [[ "$installer_args_count" -gt 0 ]]; then
+    bash scripts/install.sh "${installer_args[@]}"
+  else
+    bash scripts/install.sh
+  fi
 )
 
 CURRENT_UPDATED=0
