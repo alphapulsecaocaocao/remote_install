@@ -64,6 +64,24 @@ shasum -a 256 /path/to/.env
 ```
 
 - Configure the deployment secret outside Git. Current fallback behavior uses `DELIVERY_ENV_FILE_CONTENT`.
+- Do not update `src/install/customer-env.ts` with a new env file. It is legacy fallback content; changing it can put secrets into Git history and trigger push protection. Use Vercel environment variables instead.
+- For production on Vercel, update the project environment variable from the env file, then redeploy production so serverless functions read the new value:
+
+```bash
+cat /path/to/.env | npx --yes vercel env add DELIVERY_ENV_FILE_CONTENT production --force --yes --scope lzlrjok-1039s-projects
+npx --yes vercel deploy --prod --yes --scope lzlrjok-1039s-projects
+```
+
+- If the PR has not merged yet, deploy from the intended production commit after merge, not from a dirty working tree or feature branch. Use `git status -sb` and `git rev-parse --short HEAD` before deploying.
+- After deployment, verify the live env download matches the provided env file exactly:
+
+```bash
+curl -fsSL https://1688autoprocurement.xleeelx.online/api/downloads/tags/<newest-tag>/env -o /tmp/live.env
+wc -c /tmp/live.env /path/to/.env
+shasum -a 256 /tmp/live.env /path/to/.env
+cmp -s /tmp/live.env /path/to/.env && echo "matches yes"
+```
+
 - If different tags need different `.env` files, extend `src/lib/env-relay.ts` to prefer a tag-specific deployment variable before the generic fallback. Use a deterministic key such as:
 
 ```text
@@ -83,14 +101,14 @@ bash -n src/install/remote-install.sh
 
 For installer shell changes, also run a local `/bin/bash` 3.2 fixture if possible. Empty Bash arrays under `set -u` fail on macOS Bash 3.2, so guard empty array expansion.
 
-8. Secret scan before commit:
+8. Secret scan the staged diff before commit:
 
 ```bash
-rg -n '/Users/damien/.*\\.env|SUPABASE_ACCESS_TOKEN=|sbp_|DELIVERY_ENV_FILE_PATH' README.md src skills || true
+git diff --cached -U0 -- README.md src skills | rg -n '/Users/damien/.*\\.env|SUPABASE_ACCESS_TOKEN=|sbp_|DELIVERY_ENV_FILE_PATH' || true
 git diff --check
 ```
 
-Expected allowed mentions are documentation of variable names only, not secret values or local env paths.
+Expected allowed mentions are documentation of variable names only, not secret values or local env paths. A full-tree scan may report legacy fallback content already in the repository; do not treat that as permission to modify or refresh secret-bearing files.
 
 9. Commit, push, and open PR:
 
@@ -105,6 +123,7 @@ Use the GitHub connector to create a draft PR. Include:
 - newest tags verified
 - env file byte count and SHA-256
 - note that actual env content must be configured as protected deployment secrets
+- whether the Vercel production env variable was updated, whether production was redeployed, and the live `/env` hash after deployment
 - validation commands run
 
 ## PR Safety Notes
