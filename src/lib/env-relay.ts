@@ -23,7 +23,7 @@ export async function createTagEnvDownloadResponse(tagName: string) {
 }
 
 export async function readDeliveryEnvFileContent() {
-  return CUSTOMER_ENV_CONTENT;
+  return process.env.DELIVERY_ENV_FILE_CONTENT ?? CUSTOMER_ENV_CONTENT;
 }
 
 function buildEnvResponse(tagName: string, body: BodyInit) {
