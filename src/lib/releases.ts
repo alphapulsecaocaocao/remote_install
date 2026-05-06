@@ -70,7 +70,7 @@ type GitHubTree = {
   }>;
 };
 
-const FALLBACK_DELIVERY_TAG = "v1.17.4.fix.alpha";
+const FALLBACK_DELIVERY_TAG = "v1.17.6.alpha";
 const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
@@ -94,8 +94,8 @@ export async function getLatestDeliveryVersion(
 ): Promise<LatestDeliveryVersion> {
   const [releaseResponse, tagsResponse] = await Promise.all([
     fetcher(
-    `https://api.github.com/repos/${DELIVERY_REPO}/releases/latest`,
-    getRequestInit(),
+      `https://api.github.com/repos/${DELIVERY_REPO}/releases/latest`,
+      getRequestInit(),
     ),
     fetcher(
       `https://api.github.com/repos/${DELIVERY_REPO}/tags?per_page=100`,
@@ -332,6 +332,46 @@ const CURATED_CHANGELOGS: Record<
   string,
   DeliveryChangelog["sections"]
 > = {
+  "v1.17.6.alpha": [
+    {
+      title: "修复",
+      items: [
+        "修复 1688 登录检测、人工验证会话和登录交接中的稳定性问题。",
+        "修复供应商联系页导航和搜索结果表格处理中的边界情况。",
+      ],
+    },
+    {
+      title: "改进",
+      items: [
+        "优化 Playwright 自动化工具链，使登录态、联系人导航和搜索结果读取更可靠。",
+      ],
+    },
+  ],
+  "v1.17.5.alpha": [
+    {
+      title: "新增",
+      items: [
+        "新增持久化浏览器 profile、profile 锁和上下文管理能力，降低 1688 登录态丢失和并发冲突风险。",
+        "新增搜索任务完成度、搜索进度指标和采购字典去重相关测试与服务逻辑。",
+        "新增多项 Supabase 迁移，补齐搜索、标准化和联系人链路的数据结构演进。",
+      ],
+    },
+    {
+      title: "改进",
+      items: [
+        "优化固定搜索、联系人补全、行级同步和搜索结果抽取流程。",
+        "优化 LLM provider、阶段模型配置和标准化/文档抽取链路。",
+        "优化 chatbot 运行配置、1688 登录脚本和自动化控制服务。",
+      ],
+    },
+    {
+      title: "迁移与兼容性提示",
+      items: [
+        "本版本移除旧 BigModel 离线 batch 标准化实现，相关部署需同步使用新的文档抽取与标准化配置。",
+        "部署时需要同步新的 `.env`、chatbot 配置和数据库迁移。",
+      ],
+    },
+  ],
   "v1.17.4.fix.alpha": [
     {
       title: "改进",
