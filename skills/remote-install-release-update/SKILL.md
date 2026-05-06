@@ -65,6 +65,7 @@ shasum -a 256 /path/to/.env
 
 - Configure the deployment secret outside Git. Current fallback behavior uses `DELIVERY_ENV_FILE_CONTENT`.
 - Do not update `src/install/customer-env.ts` with a new env file. It is legacy fallback content; changing it can put secrets into Git history and trigger push protection. Use Vercel environment variables instead.
+- If env content changes, verify `src/install/remote-install.sh` refreshes `${SHARED_DIR}/.env` from `--env-file`, explicit `--env-url`, or the default tag env endpoint on every install. Do not gate env downloads behind "shared env is missing"; repeated installs must replace stale shared env content. Write through a temp file and atomic move so failed downloads preserve the previous env.
 - For production on Vercel, update the project environment variable from the env file, then redeploy production so serverless functions read the new value:
 
 ```bash
@@ -100,6 +101,11 @@ bash -n src/install/remote-install.sh
 ```
 
 For installer shell changes, also run a local `/bin/bash` 3.2 fixture if possible. Empty Bash arrays under `set -u` fail on macOS Bash 3.2, so guard empty array expansion.
+
+For env handling changes, the local fixture must precreate an old `${INSTALL_DIR}/shared/.env`, serve a different env file through `--env-url`, run the installer, and assert:
+
+- `${INSTALL_DIR}/shared/.env` exactly matches the served env file
+- `${INSTALL_DIR}/current/.env` points to `${INSTALL_DIR}/shared/.env`
 
 8. Secret scan the staged diff before commit:
 
