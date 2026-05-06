@@ -34,8 +34,8 @@ Options:
   --tag TAG               Delivery repository tag. Defaults to latest.
   --bundle-url URL        Download this explicit delivery archive instead of resolving a tag.
   --sha256 HASH           Expected SHA-256 for the downloaded archive.
-  --env-url URL           Download .env only when no existing deployment env is present.
-  --env-file PATH         Copy local env file only when no existing deployment env is present.
+  --env-url URL           Download .env into the shared deployment env during each install.
+  --env-file PATH         Copy local env file into the shared deployment env during each install.
   --prod                  Run the package installer in production mode.
   --no-start              Install without starting the app.
   --with-python           Ask the package installer to prepare uv + Python 3.13.
@@ -137,13 +137,31 @@ build_env_url() {
 download_env_file() {
   local url="$1"
   local target="$2"
+  local tmp_target
 
-  if ! curl -fsSL "$url" -o "$target"; then
-    rm -f "$target"
+  tmp_target="$(mktemp "${target}.tmp.XXXXXX")"
+  if ! curl -fsSL "$url" -o "$tmp_target"; then
+    rm -f "$tmp_target"
     die "Unable to download .env from ${url}. Check the install service env endpoint or pass --env-file."
   fi
 
-  chmod 600 "$target"
+  chmod 600 "$tmp_target"
+  mv -f "$tmp_target" "$target"
+}
+
+copy_env_file() {
+  local source="$1"
+  local target="$2"
+  local tmp_target
+
+  tmp_target="$(mktemp "${target}.tmp.XXXXXX")"
+  if ! cp "$source" "$tmp_target"; then
+    rm -f "$tmp_target"
+    die "Unable to copy .env from ${source}."
+  fi
+
+  chmod 600 "$tmp_target"
+  mv -f "$tmp_target" "$target"
 }
 
 checksum_file() {
@@ -364,18 +382,14 @@ else
   cp -R "${extract_dir}/." "$RELEASE_DIR/"
 fi
 
-if [[ ! -f "${SHARED_DIR}/.env" ]]; then
-  if [[ -f "${INSTALL_DIR}/current/.env" ]]; then
-    cp "${INSTALL_DIR}/current/.env" "${SHARED_DIR}/.env"
-    chmod 600 "${SHARED_DIR}/.env"
-  elif [[ -n "$ENV_FILE" ]]; then
-    cp "$ENV_FILE" "${SHARED_DIR}/.env"
-    chmod 600 "${SHARED_DIR}/.env"
-  elif [[ "$ENV_URL_EXPLICIT" -eq 1 ]]; then
-    download_env_file "$ENV_URL" "${SHARED_DIR}/.env"
-  elif [[ -n "$ENV_URL" ]]; then
-    download_env_file "$ENV_URL" "${SHARED_DIR}/.env"
-  fi
+if [[ -n "$ENV_FILE" ]]; then
+  copy_env_file "$ENV_FILE" "${SHARED_DIR}/.env"
+elif [[ "$ENV_URL_EXPLICIT" -eq 1 ]]; then
+  download_env_file "$ENV_URL" "${SHARED_DIR}/.env"
+elif [[ -n "$ENV_URL" ]]; then
+  download_env_file "$ENV_URL" "${SHARED_DIR}/.env"
+elif [[ ! -f "${SHARED_DIR}/.env" && -f "${INSTALL_DIR}/current/.env" ]]; then
+  copy_env_file "${INSTALL_DIR}/current/.env" "${SHARED_DIR}/.env"
 fi
 
 if [[ -f "${SHARED_DIR}/.env" ]]; then
