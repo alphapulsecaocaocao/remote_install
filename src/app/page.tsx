@@ -78,7 +78,7 @@ export default async function Home() {
                 </li>
                 <li className="flex gap-3">
                   <Step value="3" />
-                  Install into a release directory and preserve shared env.
+                  Install into a release directory and refresh shared env.
                 </li>
               </ol>
             </div>
@@ -134,8 +134,8 @@ export default async function Home() {
 
           <div className="space-y-5">
             <InfoBlock title="Secrets">
-              The installer preserves an existing deployment env, otherwise it
-              downloads the tag-specific `.env` from this service. Use
+              The installer refreshes the shared deployment `.env` from the
+              tag-specific endpoint. Use
               `--env-file` or `--env-url` to override it.
             </InfoBlock>
             <InfoBlock title="Verification">

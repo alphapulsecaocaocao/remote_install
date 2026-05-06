@@ -41,7 +41,7 @@ curl -L https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.15.1 -o
 curl -L https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.15.1/env -o .env
 ```
 
-The hosted `install.sh` resolves the delivery tag first, then downloads the matching `.env` from `/api/downloads/tags/<tag>/env` when the install root does not already have a shared env file. Pass `--env-file` or `--env-url` to override that default source.
+The hosted `install.sh` resolves the delivery tag first, then refreshes the shared deployment `.env` from `/api/downloads/tags/<tag>/env` during each install. Pass `--env-file` or `--env-url` to override that default source.
 
 Set these hosting environment variables:
 
