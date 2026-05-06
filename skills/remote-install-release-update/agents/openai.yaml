@@ -1,0 +1,4 @@
+interface:
+  display_name: "Remote Install Release Update"
+  short_description: "Update delivery tags and env handling safely."
+  default_prompt: "Use $remote-install-release-update to update the remote installer site for new delivery tags and env files."
