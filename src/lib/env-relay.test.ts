@@ -15,7 +15,7 @@ describe("createTagEnvDownloadResponse", () => {
   it("prefers env content from the deployment environment", async () => {
     process.env.DELIVERY_ENV_FILE_CONTENT = "APP_ENV=hosted\n";
 
-    const response = await createTagEnvDownloadResponse("v1.17.6.alpha");
+    const response = await createTagEnvDownloadResponse("v1.17.6.fix.alpha");
 
     expect(response.status).toBe(200);
     expect(await response.text()).toBe("APP_ENV=hosted\n");
