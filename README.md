@@ -47,7 +47,7 @@ Set these hosting environment variables:
 
 ```text
 NEXT_PUBLIC_SITE_URL=https://1688autoprocurement.xleeelx.online
-DELIVERY_DEFAULT_TAG=v1.17.6.alpha
+DELIVERY_DEFAULT_TAG=v1.17.6.fix.alpha
 GITHUB_TOKEN=<repo read token>
 DELIVERY_ENV_FILE_CONTENT=<customer .env content>
 ```

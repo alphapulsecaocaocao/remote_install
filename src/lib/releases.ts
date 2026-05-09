@@ -70,7 +70,7 @@ type GitHubTree = {
   }>;
 };
 
-const FALLBACK_DELIVERY_TAG = "v1.17.6.alpha";
+const FALLBACK_DELIVERY_TAG = "v1.17.6.fix.alpha";
 const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
@@ -332,6 +332,28 @@ const CURATED_CHANGELOGS: Record<
   string,
   DeliveryChangelog["sections"]
 > = {
+  "v1.17.6.fix.alpha": [
+    {
+      title: "新增",
+      items: [
+        "新增空闲感知轮询策略，任务活跃时保持快速刷新，空闲或页面不可见时降低前端轮询压力。",
+        "新增标准化失败重试保护，避免普通批量标准化入口重复处理仍待人工补充的失败物料。",
+      ],
+    },
+    {
+      title: "改进",
+      items: [
+        "优化搜索任务、标准化队列、手动介入和仪表盘的数据刷新链路，使任务状态反馈更稳定。",
+        "优化批次可见性和数据访问范围查询，减少非管理员视角下的无效数据读取。",
+      ],
+    },
+    {
+      title: "运维 / 配置",
+      items: [
+        "新增 Supabase 索引和 RLS 策略调整，降低任务列表、批次访问和 1688 账号查询的数据库 egress 与扫描成本。",
+      ],
+    },
+  ],
   "v1.17.6.alpha": [
     {
       title: "修复",
