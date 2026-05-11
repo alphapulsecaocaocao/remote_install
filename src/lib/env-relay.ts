@@ -12,7 +12,7 @@ export async function createTagEnvDownloadResponse(tagName: string) {
     return new Response("Invalid delivery tag.\n", { status: 400 });
   }
 
-  const envFileContent = await readDeliveryEnvFileContent();
+  const envFileContent = await readDeliveryEnvFileContent(normalizedTag);
 
   if (envFileContent) {
     return buildEnvResponse(normalizedTag, envFileContent);
@@ -22,8 +22,16 @@ export async function createTagEnvDownloadResponse(tagName: string) {
   });
 }
 
-export async function readDeliveryEnvFileContent() {
-  return process.env.DELIVERY_ENV_FILE_CONTENT ?? CUSTOMER_ENV_CONTENT;
+export async function readDeliveryEnvFileContent(tagName?: string) {
+  const tagSpecificKey = tagName
+    ? buildTagEnvVariableName(tagName)
+    : null;
+
+  return (
+    (tagSpecificKey ? process.env[tagSpecificKey] : undefined) ??
+    process.env.DELIVERY_ENV_FILE_CONTENT ??
+    CUSTOMER_ENV_CONTENT
+  );
 }
 
 function buildEnvResponse(tagName: string, body: BodyInit) {
@@ -35,4 +43,10 @@ function buildEnvResponse(tagName: string, body: BodyInit) {
       "X-Content-Type-Options": "nosniff",
     },
   });
+}
+
+export function buildTagEnvVariableName(tagName: string) {
+  return `DELIVERY_ENV_FILE_CONTENT__${normalizeTagName(tagName)
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "_")}`;
 }
