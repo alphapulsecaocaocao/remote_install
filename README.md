@@ -47,10 +47,11 @@ Set these hosting environment variables:
 
 ```text
 NEXT_PUBLIC_SITE_URL=https://1688autoprocurement.xleeelx.online
-DELIVERY_DEFAULT_TAG=v1.17.6.fix.alpha
+DELIVERY_DEFAULT_TAG=v1.18.0.alpha
 GITHUB_TOKEN=<repo read token>
 DELIVERY_ENV_FILE_CONTENT=<customer .env content>
+DELIVERY_ENV_FILE_CONTENT__V1_18_0_ALPHA=<customer .env content for v1.18.0.alpha>
 ```
 
 `GITHUB_TOKEN` is required when the delivery repository is private. It is used only server-side to resolve metadata and stream private tag archives through `/api/downloads/*`.
-`DELIVERY_ENV_FILE_CONTENT` is used server-side by `/api/downloads/tags/<tag>/env` and should be configured as a protected deployment environment variable, not committed to Git.
+`DELIVERY_ENV_FILE_CONTENT__<NORMALIZED_TAG>` is used server-side by `/api/downloads/tags/<tag>/env` when a tag-specific env file is needed. `DELIVERY_ENV_FILE_CONTENT` remains the generic fallback. Both should be configured as protected deployment environment variables, not committed to Git.

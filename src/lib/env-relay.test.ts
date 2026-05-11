@@ -3,17 +3,34 @@ import { createHash } from "node:crypto";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { CUSTOMER_ENV_CONTENT } from "../install/customer-env";
-import { createTagEnvDownloadResponse } from "./env-relay";
+import {
+  buildTagEnvVariableName,
+  createTagEnvDownloadResponse,
+} from "./env-relay";
 
 describe("createTagEnvDownloadResponse", () => {
   const originalEnvFileContent = process.env.DELIVERY_ENV_FILE_CONTENT;
+  const v118EnvKey = buildTagEnvVariableName("v1.18.0.alpha");
+  const originalV118EnvFileContent = process.env[v118EnvKey];
 
   afterEach(() => {
-    process.env.DELIVERY_ENV_FILE_CONTENT = originalEnvFileContent;
+    restoreEnv("DELIVERY_ENV_FILE_CONTENT", originalEnvFileContent);
+    restoreEnv(v118EnvKey, originalV118EnvFileContent);
   });
 
-  it("prefers env content from the deployment environment", async () => {
+  it("prefers tag-specific env content from the deployment environment", async () => {
+    process.env.DELIVERY_ENV_FILE_CONTENT = "APP_ENV=generic\n";
+    process.env[v118EnvKey] = "APP_ENV=v118\n";
+
+    const response = await createTagEnvDownloadResponse("v1.18.0.alpha");
+
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe("APP_ENV=v118\n");
+  });
+
+  it("falls back to generic env content from the deployment environment", async () => {
     process.env.DELIVERY_ENV_FILE_CONTENT = "APP_ENV=hosted\n";
+    delete process.env[v118EnvKey];
 
     const response = await createTagEnvDownloadResponse("v1.17.6.fix.alpha");
 
@@ -44,4 +61,12 @@ describe("createTagEnvDownloadResponse", () => {
 
 function sha256(value: string) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+function restoreEnv(key: string, value: string | undefined) {
+  if (value === undefined) {
+    delete process.env[key];
+  } else {
+    process.env[key] = value;
+  }
 }

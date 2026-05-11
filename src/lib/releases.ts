@@ -70,7 +70,7 @@ type GitHubTree = {
   }>;
 };
 
-const FALLBACK_DELIVERY_TAG = "v1.17.6.fix.alpha";
+const FALLBACK_DELIVERY_TAG = "v1.18.0.alpha";
 const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
@@ -332,6 +332,31 @@ const CURATED_CHANGELOGS: Record<
   string,
   DeliveryChangelog["sections"]
 > = {
+  "v1.18.0.alpha": [
+    {
+      title: "新增",
+      items: [
+        "新增 AI 搜索词规划和固定搜索补抓词优化能力，基于标准化结果、命中率和拒绝原因生成更稳定的 1688 搜索词。",
+        "新增固定搜索候选池去重与补抓调度，按商家、商品链接和关键词来源控制候选规模。",
+        "新增标准化失败重试来源恢复能力，人工补充后可基于原始物料快照重新发起标准化。",
+      ],
+    },
+    {
+      title: "改进",
+      items: [
+        "优化固定搜索、联系人补全和搜索登录交接流程，降低重复候选、低质量搜索方向和登录态中断的影响。",
+        "优化物料页标准化选择逻辑，避免跨批次误操作，并提升单批次勾选标准化的稳定性。",
+        "优化搜索结果、标准化列表和任务状态页面的数据刷新与查询复用。",
+      ],
+    },
+    {
+      title: "运维 / 配置",
+      items: [
+        "新增 Prompt Store 和关键词规划相关配置项，部署时需要同步新的 `.env`。",
+        "新增搜索读取路径、结果标题和商家名称索引，降低任务列表、搜索结果和状态统计的数据库读取成本。",
+      ],
+    },
+  ],
   "v1.17.6.fix.alpha": [
     {
       title: "新增",
