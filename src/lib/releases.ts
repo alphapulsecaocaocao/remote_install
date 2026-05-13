@@ -70,7 +70,7 @@ type GitHubTree = {
   }>;
 };
 
-const FALLBACK_DELIVERY_TAG = "v1.19.1.preview.alpha";
+const FALLBACK_DELIVERY_TAG = "v1.20.0.preview";
 const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
@@ -332,6 +332,31 @@ const CURATED_CHANGELOGS: Record<
   string,
   DeliveryChangelog["sections"]
 > = {
+  "v1.20.0.preview": [
+    {
+      title: "新增",
+      items: [
+        "新增固定搜索工作流诊断封装，外部搜索、验证码、登录态和页面超时等阻断会沉淀为可追踪的任务结果。",
+        "新增在线标准化任务状态恢复与孤儿任务收敛逻辑，降低服务重启或中断后任务长期卡在运行中的风险。",
+        "新增 AI 关键词规划回归能力，强化品牌约束、整机/系统类采购意图和无效配置词过滤。",
+      ],
+    },
+    {
+      title: "改进",
+      items: [
+        "优化物料标准化选择、表格宽度填充和可见行勾选逻辑，减少跨批次误操作和表格窄屏错位。",
+        "优化空字段占位符识别与 HTML 实体清洗，降低导入字段中的“待识别”“未提供”等占位文本污染后续流程。",
+        "优化搜索任务状态、搜索结果和标准化页面的数据刷新与查询键复用。",
+      ],
+    },
+    {
+      title: "运维 / 配置",
+      items: [
+        "新增搜索读取路径优化迁移，并更新 Prompt Store 相关 schema 文档。",
+        "本 preview 版本继续要求部署侧同步最新 `.env`，但本次 remote installer 更新未收到新的 `.env` 文件。",
+      ],
+    },
+  ],
   "v1.19.1.preview.alpha": [
     {
       title: "新增",
