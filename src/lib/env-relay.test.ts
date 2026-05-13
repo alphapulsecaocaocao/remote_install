@@ -10,7 +10,7 @@ import {
 
 describe("createTagEnvDownloadResponse", () => {
   const originalEnvFileContent = process.env.DELIVERY_ENV_FILE_CONTENT;
-  const v119EnvKey = buildTagEnvVariableName("v1.19.0.preview.alpha");
+  const v119EnvKey = buildTagEnvVariableName("v1.19.1.preview.alpha");
   const originalV119EnvFileContent = process.env[v119EnvKey];
 
   afterEach(() => {
@@ -22,7 +22,7 @@ describe("createTagEnvDownloadResponse", () => {
     process.env.DELIVERY_ENV_FILE_CONTENT = "APP_ENV=generic\n";
     process.env[v119EnvKey] = "APP_ENV=v119\n";
 
-    const response = await createTagEnvDownloadResponse("v1.19.0.preview.alpha");
+    const response = await createTagEnvDownloadResponse("v1.19.1.preview.alpha");
 
     expect(response.status).toBe(200);
     expect(await response.text()).toBe("APP_ENV=v119\n");
