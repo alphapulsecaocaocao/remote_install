@@ -70,7 +70,7 @@ type GitHubTree = {
   }>;
 };
 
-const FALLBACK_DELIVERY_TAG = "v1.19.0.preview.alpha";
+const FALLBACK_DELIVERY_TAG = "v1.19.1.preview.alpha";
 const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
@@ -332,6 +332,27 @@ const CURATED_CHANGELOGS: Record<
   string,
   DeliveryChangelog["sections"]
 > = {
+  "v1.19.1.preview.alpha": [
+    {
+      title: "新增",
+      items: [
+        "新增项目内置 Hermes skill catalog，交付包自带 1688 关键词识别、商品链接查找和商品识别说明三类 skill。",
+        "新增 1688 商品链接查找的飞书截图报告参考流程，便于后续输出商家链接、商品链接和截图证据。",
+      ],
+    },
+    {
+      title: "改进",
+      items: [
+        "优化 skill loader 默认路径，默认从交付包内 `automation/skills/catalog` 加载受控 skill，降低外部目录依赖。",
+      ],
+    },
+    {
+      title: "运维 / 配置",
+      items: [
+        "更新 skill 相关 `.env` 示例，部署时应同步新的 `SKILL_ROOTS`、allowlist 和 Agentic Web 配置。",
+      ],
+    },
+  ],
   "v1.19.0.preview.alpha": [
     {
       title: "新增",
