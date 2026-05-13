@@ -70,7 +70,7 @@ type GitHubTree = {
   }>;
 };
 
-const FALLBACK_DELIVERY_TAG = "v1.18.0.alpha";
+const FALLBACK_DELIVERY_TAG = "v1.19.0.preview.alpha";
 const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
@@ -332,6 +332,31 @@ const CURATED_CHANGELOGS: Record<
   string,
   DeliveryChangelog["sections"]
 > = {
+  "v1.19.0.preview.alpha": [
+    {
+      title: "新增",
+      items: [
+        "新增 Agentic Web Tools 和 Firecrawl 后端接入，可在受控开关下为标准化和搜索链路补充网页搜索与内容抽取证据。",
+        "新增 Hermes skill 加载、路由和运行框架，支持按采购任务选择关键词识别、商品链接查找和人工说明类 skill。",
+        "新增基于 skill/web evidence 的标准化搜索词生成能力，将工具调用记录转化为可追踪的建议搜索词。",
+      ],
+    },
+    {
+      title: "改进",
+      items: [
+        "优化固定搜索、搜索计划、联系人补全和行级同步流程，改用新的 skill/webtool 搜索链路承接搜索词与候选来源。",
+        "优化标准化合同、失败补充和打印视图相关流程，使人工补充与后续搜索更容易追踪来源。",
+        "优化 API 认证瞬时网络错误识别，减少 Supabase auth 短暂失败对自动化服务的影响。",
+      ],
+    },
+    {
+      title: "运维 / 配置",
+      items: [
+        "新增 Agentic Web、Firecrawl 和 skill allowlist 相关配置项，部署时需要同步新的 `.env`。",
+        "本 preview 版本移除上一版部分固定搜索候选池和 AI 关键词规划实现，相关搜索能力迁移到 skill/webtool 路径。",
+      ],
+    },
+  ],
   "v1.18.0.alpha": [
     {
       title: "新增",
