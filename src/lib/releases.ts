@@ -70,7 +70,7 @@ type GitHubTree = {
   }>;
 };
 
-const FALLBACK_DELIVERY_TAG = "v1.20.0.preview";
+const FALLBACK_DELIVERY_TAG = "v1.21.0.preview";
 const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
@@ -332,6 +332,31 @@ const CURATED_CHANGELOGS: Record<
   string,
   DeliveryChangelog["sections"]
 > = {
+  "v1.21.0.preview": [
+    {
+      title: "新增",
+      items: [
+        "新增快速搜索独立流程和结果页，支持从物料行发起搜索、跟踪运行事件、保存候选商品与联系人线索。",
+        "新增 AI 询盘与外呼相关运行能力，支持按账号队列执行旺旺询盘、记录失败原因，并沉淀外呼任务数据。",
+        "新增 SearXNG 部署配置和多组 1688 商品链接查找参考流程，为网页搜索与商品寻源提供可复用示例。",
+      ],
+    },
+    {
+      title: "改进",
+      items: [
+        "优化物料、搜索结果、标准化和智能询盘页面的数据刷新与表格交互，减少状态滞后和跨页面缓存错配。",
+        "优化 1688 登录、联系人导航、搜索阻断识别和浏览器 profile 管理，提高自动化搜索链路的稳定性。",
+        "优化标准化失败提示、行级同步、搜索短缺总结和商家身份识别，使人工补充与后续搜索更容易衔接。",
+      ],
+    },
+    {
+      title: "运维 / 配置",
+      items: [
+        "新增快速搜索、AI 询盘、外呼、搜索状态审计和联系人补全相关数据库迁移，升级前需同步执行迁移。",
+        "本 preview 版本更新 `.env.example` 和部署配置，生产部署需同步本次提供的 `.env` 文件。",
+      ],
+    },
+  ],
   "v1.20.0.preview": [
     {
       title: "新增",
