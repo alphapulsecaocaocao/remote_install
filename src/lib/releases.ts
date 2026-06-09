@@ -70,7 +70,7 @@ type GitHubTree = {
   }>;
 };
 
-const FALLBACK_DELIVERY_TAG = "v1.21.0.preview";
+const FALLBACK_DELIVERY_TAG = "v1.21.1.preview";
 const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
@@ -332,6 +332,22 @@ const CURATED_CHANGELOGS: Record<
   string,
   DeliveryChangelog["sections"]
 > = {
+  "v1.21.1.preview": [
+    {
+      title: "改进",
+      items: [
+        "优化 1688 商品关键词识别 skill 和独立快速搜索流程的 manifest，同步补齐搜索意图生成测试。",
+        "补充快速搜索集成设计与执行计划文档，方便后续维护快速搜索、关键词识别和商品链接查找链路。",
+      ],
+    },
+    {
+      title: "运维 / 配置",
+      items: [
+        "补回项目报告大纲和 Prompt Store 设计说明，提升交付包内文档完整性。",
+        "本 preview 小版本未引入新的应用配置项；生产部署仍需同步本次提供的 `.env` 文件。",
+      ],
+    },
+  ],
   "v1.21.0.preview": [
     {
       title: "新增",
