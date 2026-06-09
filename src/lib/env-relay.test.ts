@@ -10,27 +10,27 @@ import {
 
 describe("createTagEnvDownloadResponse", () => {
   const originalEnvFileContent = process.env.DELIVERY_ENV_FILE_CONTENT;
-  const v120EnvKey = buildTagEnvVariableName("v1.20.0.preview");
-  const originalV120EnvFileContent = process.env[v120EnvKey];
+  const v121EnvKey = buildTagEnvVariableName("v1.21.0.preview");
+  const originalV121EnvFileContent = process.env[v121EnvKey];
 
   afterEach(() => {
     restoreEnv("DELIVERY_ENV_FILE_CONTENT", originalEnvFileContent);
-    restoreEnv(v120EnvKey, originalV120EnvFileContent);
+    restoreEnv(v121EnvKey, originalV121EnvFileContent);
   });
 
   it("prefers tag-specific env content from the deployment environment", async () => {
     process.env.DELIVERY_ENV_FILE_CONTENT = "APP_ENV=generic\n";
-    process.env[v120EnvKey] = "APP_ENV=v120\n";
+    process.env[v121EnvKey] = "APP_ENV=v121\n";
 
-    const response = await createTagEnvDownloadResponse("v1.20.0.preview");
+    const response = await createTagEnvDownloadResponse("v1.21.0.preview");
 
     expect(response.status).toBe(200);
-    expect(await response.text()).toBe("APP_ENV=v120\n");
+    expect(await response.text()).toBe("APP_ENV=v121\n");
   });
 
   it("falls back to generic env content from the deployment environment", async () => {
     process.env.DELIVERY_ENV_FILE_CONTENT = "APP_ENV=hosted\n";
-    delete process.env[v120EnvKey];
+    delete process.env[v121EnvKey];
 
     const response = await createTagEnvDownloadResponse("v1.17.6.fix.alpha");
 
