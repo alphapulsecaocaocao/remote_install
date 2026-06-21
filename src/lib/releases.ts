@@ -70,7 +70,7 @@ type GitHubTree = {
   }>;
 };
 
-const FALLBACK_DELIVERY_TAG = "v1.21.1.preview";
+const FALLBACK_DELIVERY_TAG = "v1.22.0.preview";
 const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
@@ -332,6 +332,30 @@ const CURATED_CHANGELOGS: Record<
   string,
   DeliveryChangelog["sections"]
 > = {
+  "v1.22.0.preview": [
+    {
+      title: "新增",
+      items: [
+        "新增快速搜索客户评估、离线案例批处理和覆盖率回归能力，便于持续校验采购搜索策略效果。",
+        "新增采购策略矩阵、品类归档和产品族画像数据，强化快速搜索的查询扩展与候选排序依据。",
+        "新增快速搜索 search mode 数据库迁移，为后续按模式拆分搜索结果与策略提供结构支持。",
+      ],
+    },
+    {
+      title: "改进",
+      items: [
+        "优化快速搜索入口、结果页、搜索工具排序和短缺分析，让物料页发起搜索与结果复核更稳定。",
+        "优化 1688 聚合搜索、商家身份识别和持久化链路，降低候选来源错配与重复记录的风险。",
+        "扩展 Hermes 商品链接查找 skill 的操作说明和 schema 校验，提升独立搜索流程的可维护性。",
+      ],
+    },
+    {
+      title: "运维 / 配置",
+      items: [
+        "更新快速搜索相关依赖、测试夹具和 `.env` 配置要求；生产部署需同步本次提供的 `.env` 文件。",
+      ],
+    },
+  ],
   "v1.21.1.preview": [
     {
       title: "改进",

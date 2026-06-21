@@ -9,14 +9,15 @@ describe("getLatestDeliveryVersion", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          tag_name: "v1.21.1.preview",
+          tag_name: "v1.22.0.preview",
           html_url:
-            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.21.1.preview",
+            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.22.0.preview",
         }),
       })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [
+          { name: "v1.22.0.preview" },
           { name: "v1.21.1.preview" },
           { name: "v1.21.0.preview" },
           { name: "v1.20.0.preview" },
@@ -36,9 +37,9 @@ describe("getLatestDeliveryVersion", () => {
     );
     expect(latest).toMatchObject({
       source: "release",
-      tagName: "v1.21.1.preview",
+      tagName: "v1.22.0.preview",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.21.1.preview",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.22.0.preview",
     });
   });
 
@@ -56,6 +57,7 @@ describe("getLatestDeliveryVersion", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [
+          { name: "v1.22.0.preview" },
           { name: "v1.21.1.preview" },
           { name: "v1.21.0.preview" },
           { name: "v1.20.0.preview" },
@@ -75,9 +77,9 @@ describe("getLatestDeliveryVersion", () => {
 
     expect(latest).toMatchObject({
       source: "tag",
-      tagName: "v1.21.1.preview",
+      tagName: "v1.22.0.preview",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.21.1.preview",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.22.0.preview",
     });
   });
 
@@ -116,9 +118,9 @@ describe("getLatestDeliveryVersion", () => {
 
     expect(latest).toMatchObject({
       source: "configured",
-      tagName: "v1.21.1.preview",
+      tagName: "v1.22.0.preview",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.21.1.preview",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.22.0.preview",
     });
   });
 });
@@ -128,6 +130,7 @@ describe("getDeliveryVersions", () => {
     const fetchMock = vi.fn(async (url: string) => {
       if (url.endsWith("/tags?per_page=100")) {
         return Response.json([
+          { name: "v1.22.0.preview" },
           { name: "v1.21.1.preview" },
           { name: "v1.21.0.preview" },
           { name: "v1.20.0.preview" },
@@ -144,6 +147,15 @@ describe("getDeliveryVersions", () => {
           { name: "bad tag" },
           { name: "v1.16.0" },
         ]);
+      }
+
+      if (url.endsWith("/commits/v1.22.0.preview")) {
+        return Response.json({
+          commit: {
+            author: { date: "2026-06-21T15:56:39Z" },
+            message: "delivery: 2026-06-21 snapshot from dcd00c887b48",
+          },
+        });
       }
 
       if (url.endsWith("/commits/v1.21.1.preview")) {
@@ -251,6 +263,58 @@ describe("getDeliveryVersions", () => {
             author: { date: "2026-04-26T09:00:00Z" },
             message: "delivery: 2026-04-26 snapshot from 000000000000",
           },
+        });
+      }
+
+      if (url.endsWith("/git/trees/v1.22.0.preview?recursive=1")) {
+        return Response.json({
+          truncated: false,
+          tree: [
+            { path: "automation/agentic-tools/web/research.ts", sha: "web-research", type: "blob" },
+            { path: "automation/agentic-tools/web/web-tools.ts", sha: "web-tools-v121", type: "blob" },
+            { path: "automation/fast-search/runtime.ts", sha: "fast-search-runtime", type: "blob" },
+            { path: "automation/fast-search/persistence.ts", sha: "fast-search-persistence-v122", type: "blob" },
+            { path: "automation/fast-search/customer-eval-corpus.test.ts", sha: "customer-eval-corpus", type: "blob" },
+            { path: "automation/fast-search/fixtures/procurement-policy-matrix.v2.json", sha: "policy-matrix-v2", type: "blob" },
+            { path: "automation/fast-search/standalone-flow/hermes-1688-skills-20260518-221929/productivity/1688-identify-product-keywords/SKILL.md", sha: "standalone-keywords-v1211", type: "blob" },
+            { path: "automation/fast-search/standalone-flow/scripts/framework/skill-manifest.json", sha: "standalone-manifest-v1211", type: "blob" },
+            { path: "automation/fast-search/standalone-flow/scripts/generate-search-intents.test.ts", sha: "standalone-intents-v1211", type: "blob" },
+            { path: "automation/internal/api-auth-errors.ts", sha: "api-auth", type: "blob" },
+            { path: "automation/internal/login-1688.js", sha: "login-v121", type: "blob" },
+            { path: "automation/internal/server.ts", sha: "server-v120", type: "blob" },
+            { path: "automation/internal/standardization-task-state.ts", sha: "standardization-task-state", type: "blob" },
+            { path: "automation/keywords/ai-keyword-planner.ts", sha: "keyword-planner-v120", type: "blob" },
+            { path: "automation/keywords/keyword-generator.ts", sha: "keyword-generator-v121", type: "blob" },
+            { path: "automation/pipelines/search-workflow.ts", sha: "search-workflow", type: "blob" },
+            { path: "automation/pipelines/skill-webtool-search.ts", sha: "skill-search-v120", type: "blob" },
+            { path: "automation/playwright/contact-page-navigation.js", sha: "contact-v120", type: "blob" },
+            { path: "automation/playwright/persistent-context.js", sha: "context", type: "blob" },
+            { path: "automation/playwright/profile-lock.js", sha: "lock", type: "blob" },
+            { path: "automation/playwright/search-blockage.js", sha: "search-blockage", type: "blob" },
+            { path: "automation/skills/catalog/1688-find-product-links/SKILL.md", sha: "find-links-skill", type: "blob" },
+            { path: "automation/skills/catalog/1688-identify-product-keywords/SKILL.md", sha: "keywords-skill-v1211", type: "blob" },
+            { path: "automation/skills/catalog/1688-product-identification-search/SKILL.md", sha: "overview-skill", type: "blob" },
+            { path: "automation/skills/skill-loader.ts", sha: "skill-loader-v1191", type: "blob" },
+            { path: "automation/skills/skill-router.ts", sha: "skill-router", type: "blob" },
+            { path: "automation/standardization/skill-search-terms.ts", sha: "skill-terms", type: "blob" },
+            { path: "chatbot/src/ai-inquiry-worker.js", sha: "ai-inquiry-worker", type: "blob" },
+            { path: "docs/project-report-outline.md", sha: "project-report-outline", type: "blob" },
+            { path: "docs/prompt-store-design.md", sha: "prompt-store-design", type: "blob" },
+            { path: "docs/superpowers/plans/2026-06-05-fast-search-integration.md", sha: "fast-search-plan", type: "blob" },
+            { path: "docs/superpowers/specs/2026-06-05-fast-search-integration-design.md", sha: "fast-search-spec", type: "blob" },
+            { path: "scripts/install.sh", sha: "install-new", type: "blob" },
+            { path: "src/features/materials/lib/standardizationSelection.ts", sha: "selection-v120", type: "blob" },
+            { path: "src/lib/emptyFieldPlaceholders.ts", sha: "empty-placeholders", type: "blob" },
+            { path: "src/lib/pollingPolicy.ts", sha: "polling", type: "blob" },
+            { path: "src/lib/visibleSelection.ts", sha: "visible-selection", type: "blob" },
+            { path: "src/pages/FastSearchResults.tsx", sha: "fast-search-results-v122", type: "blob" },
+            { path: "src/services/searchService.ts", sha: "search-service-v120", type: "blob" },
+            { path: "supabase/migrations/20260506.sql", sha: "migration", type: "blob" },
+            { path: "supabase/migrations/20260508000100_optimize_supabase_egress.sql", sha: "egress", type: "blob" },
+            { path: "supabase/migrations/20260511000100_optimize_search_read_paths.sql", sha: "search-read", type: "blob" },
+            { path: "supabase/migrations/20260605000100_fast_search.sql", sha: "fast-search-migration", type: "blob" },
+            { path: "supabase/migrations/20260615000100_fast_search_search_mode.sql", sha: "fast-search-search-mode", type: "blob" },
+          ],
         });
       }
 
@@ -559,6 +623,7 @@ describe("getDeliveryVersions", () => {
       expect.any(Object),
     );
     expect(versions.map((version) => version.tagName)).toEqual([
+      "v1.22.0.preview",
       "v1.21.1.preview",
       "v1.21.0.preview",
       "v1.20.0.preview",
@@ -573,12 +638,29 @@ describe("getDeliveryVersions", () => {
       "v1.15.1",
     ]);
     expect(versions[0]?.changelog.sections[0]).toMatchObject({
+      title: "新增",
+      items: expect.arrayContaining([
+        "新增快速搜索客户评估、离线案例批处理和覆盖率回归能力，便于持续校验采购搜索策略效果。",
+      ]),
+    });
+    expect(versions[0]).toMatchObject({
+      changelog: {
+        previousTagName: "v1.21.1.preview",
+        sourceCommit: "dcd00c887b48",
+        totals: {
+          added: 3,
+          modified: 2,
+          removed: 0,
+        },
+      },
+    });
+    expect(versions[1]?.changelog.sections[0]).toMatchObject({
       title: "改进",
       items: expect.arrayContaining([
         "优化 1688 商品关键词识别 skill 和独立快速搜索流程的 manifest，同步补齐搜索意图生成测试。",
       ]),
     });
-    expect(versions[0]).toMatchObject({
+    expect(versions[1]).toMatchObject({
       changelog: {
         previousTagName: "v1.21.0.preview",
         sourceCommit: "43c6a69c5234",
@@ -589,13 +671,13 @@ describe("getDeliveryVersions", () => {
         },
       },
     });
-    expect(versions[1]?.changelog.sections[0]).toMatchObject({
+    expect(versions[2]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增快速搜索独立流程和结果页，支持从物料行发起搜索、跟踪运行事件、保存候选商品与联系人线索。",
       ]),
     });
-    expect(versions[1]).toMatchObject({
+    expect(versions[2]).toMatchObject({
       changelog: {
         previousTagName: "v1.20.0.preview",
         sourceCommit: "61e5e75542f3",
@@ -606,13 +688,13 @@ describe("getDeliveryVersions", () => {
         },
       },
     });
-    expect(versions[2]?.changelog.sections[0]).toMatchObject({
+    expect(versions[3]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增固定搜索工作流诊断封装，外部搜索、验证码、登录态和页面超时等阻断会沉淀为可追踪的任务结果。",
       ]),
     });
-    expect(versions[2]).toMatchObject({
+    expect(versions[3]).toMatchObject({
       changelog: {
         previousTagName: "v1.19.1.preview.alpha",
         sourceCommit: "3a29c8fbbeea",
@@ -623,43 +705,43 @@ describe("getDeliveryVersions", () => {
         },
       },
     });
-    expect(versions[3]?.changelog.sections[0]).toMatchObject({
+    expect(versions[4]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增项目内置 Hermes skill catalog，交付包自带 1688 关键词识别、商品链接查找和商品识别说明三类 skill。",
       ]),
     });
-    expect(versions[4]?.changelog.sections[0]).toMatchObject({
+    expect(versions[5]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增 Agentic Web Tools 和 Firecrawl 后端接入，可在受控开关下为标准化和搜索链路补充网页搜索与内容抽取证据。",
       ]),
     });
-    expect(versions[5]?.changelog.sections[0]).toMatchObject({
+    expect(versions[6]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增 AI 搜索词规划和固定搜索补抓词优化能力，基于标准化结果、命中率和拒绝原因生成更稳定的 1688 搜索词。",
       ]),
     });
-    expect(versions[6]?.changelog.sections[0]).toMatchObject({
+    expect(versions[7]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增空闲感知轮询策略，任务活跃时保持快速刷新，空闲或页面不可见时降低前端轮询压力。",
       ]),
     });
-    expect(versions[7]?.changelog.sections[0]).toMatchObject({
+    expect(versions[8]?.changelog.sections[0]).toMatchObject({
       title: "修复",
       items: expect.arrayContaining([
         "修复 1688 登录检测、人工验证会话和登录交接中的稳定性问题。",
       ]),
     });
-    expect(versions[8]?.changelog.sections[0]).toMatchObject({
+    expect(versions[9]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增持久化浏览器 profile、profile 锁和上下文管理能力，降低 1688 登录态丢失和并发冲突风险。",
       ]),
     });
-    expect(versions[9]).toMatchObject({
+    expect(versions[10]).toMatchObject({
       archiveUrl:
         "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.17.4.fix.alpha",
       htmlUrl:
@@ -674,7 +756,7 @@ describe("getDeliveryVersions", () => {
         },
       },
     });
-    expect(versions[9]?.changelog.sections).toEqual([
+    expect(versions[10]?.changelog.sections).toEqual([
       {
         title: "改进",
         items: [
@@ -682,10 +764,10 @@ describe("getDeliveryVersions", () => {
         ],
       },
     ]);
-    expect(JSON.stringify(versions[9]?.changelog.sections)).not.toContain(
+    expect(JSON.stringify(versions[10]?.changelog.sections)).not.toContain(
       "automation/",
     );
-    expect(versions[11]?.changelog.sections).toEqual([
+    expect(versions[12]?.changelog.sections).toEqual([
       {
         title: "新增",
         items: [
