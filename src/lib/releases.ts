@@ -70,7 +70,7 @@ type GitHubTree = {
   }>;
 };
 
-const FALLBACK_DELIVERY_TAG = "v1.22.0.preview";
+const FALLBACK_DELIVERY_TAG = "v1.23.0.preview";
 const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
@@ -332,6 +332,31 @@ const CURATED_CHANGELOGS: Record<
   string,
   DeliveryChangelog["sections"]
 > = {
+  "v1.23.0.preview": [
+    {
+      title: "新增",
+      items: [
+        "新增 Agent Search 独立搜索链路，支持按任务调度、并发控制、事件记录、结果归一化和报告导出。",
+        "新增 Agent Search 前端发起入口、结果页和实时事件订阅，物料页可直接进入新的代理搜索流程。",
+        "新增 Hermes Agent Search 配置脚本和多组持久化、调度、边界校验测试，提升自动化搜索链路可回归性。",
+      ],
+    },
+    {
+      title: "改进",
+      items: [
+        "优化快速搜索评估、采购策略、查询扩展和短缺分析逻辑，使旧快速搜索与新 Agent Search 更容易并行校验。",
+        "优化实时刷新、导航刷新和 Supabase 查询键管理，减少搜索结果、物料页和后台任务之间的状态滞后。",
+        "优化标准化任务恢复、数据库 JSON 清洗和自动化服务 schema，同步增强异常任务的恢复能力。",
+      ],
+    },
+    {
+      title: "运维 / 配置",
+      items: [
+        "新增 Agent Search、标准化索引和持久化可靠性相关数据库迁移，并移除旧 remote baseline placeholder 迁移。",
+        "更新 `.env.example`、部署说明和 Agent Search 相关脚本；生产部署需同步本次提供的 `.env` 文件。",
+      ],
+    },
+  ],
   "v1.22.0.preview": [
     {
       title: "新增",
