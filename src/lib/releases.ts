@@ -70,7 +70,7 @@ type GitHubTree = {
   }>;
 };
 
-const FALLBACK_DELIVERY_TAG = "v1.23.0.preview";
+const FALLBACK_DELIVERY_TAG = "v1.23.1.preview";
 const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
@@ -332,6 +332,30 @@ const CURATED_CHANGELOGS: Record<
   string,
   DeliveryChangelog["sections"]
 > = {
+  "v1.23.1.preview": [
+    {
+      title: "新增",
+      items: [
+        "新增 Agent Search family gates、风险评审和反馈记录能力，便于在搜索结果进入采购复核前先做质量筛选。",
+        "新增 Agent Search 卡片网格和选择模型，结果页可更清晰地呈现候选商品、证据与风险提示。",
+        "新增 Hermes 1688 v3 profile 构建脚本和打包产物，降低部署 Agent Search 运行环境的准备成本。",
+      ],
+    },
+    {
+      title: "改进",
+      items: [
+        "优化 Agent Search 导出、归一化、提示词、路由和调度链路，提升搜索结果结构化与批量运行稳定性。",
+        "优化 Agent Search 前端结果页和服务层测试，使风险、反馈和候选选择状态更容易回归验证。",
+        "优化自动化服务、部署说明和 setup 脚本，同步补齐风险评审相关数据库迁移。",
+      ],
+    },
+    {
+      title: "运维 / 配置",
+      items: [
+        "本 preview 小版本更新 Agent Search 运行配置与 `.env` 要求；生产部署需同步本次提供的 `.env` 文件。",
+      ],
+    },
+  ],
   "v1.23.0.preview": [
     {
       title: "新增",
