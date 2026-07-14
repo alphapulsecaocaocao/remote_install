@@ -70,7 +70,7 @@ type GitHubTree = {
   }>;
 };
 
-const FALLBACK_DELIVERY_TAG = "v1.23.1.preview";
+const FALLBACK_DELIVERY_TAG = "v1.23.2.preview";
 const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
@@ -332,6 +332,37 @@ const CURATED_CHANGELOGS: Record<
   string,
   DeliveryChangelog["sections"]
 > = {
+  "v1.23.2.preview": [
+    {
+      title: "新增",
+      items: [
+        "新增 Agent Search 多轮深搜、采集预算和启动恢复能力，可按候选增量、供应商覆盖与资源上限持续补充结果。",
+        "新增物料范围、运行记录和候选结果选择控件，支持从指定物料批量发起搜索并在结果页快速切换任务。",
+        "新增反馈规则版本、artifact 策略和运行血缘记录，为配置发布、回滚和搜索过程审计提供依据。",
+      ],
+    },
+    {
+      title: "改进",
+      items: [
+        "优化商家覆盖区间、对象类型门禁和图片证据回补，降低供应商重复计数、非目标对象混入与无图结果漏审风险。",
+        "优化 Agent Search 列表投影、详情加载、分页和事件重连，提升大批量结果浏览与中断恢复体验。",
+        "优化快速搜索与 Agent Search 的物料范围衔接、调度和导出契约，使搜索入口与结果数据保持一致。",
+      ],
+    },
+    {
+      title: "运维 / 配置",
+      items: [
+        "更新 Agent Search、Hermes 和多轮深搜相关 `.env` 配置；生产部署需同步本次提供的 `.env` 文件。",
+        "多轮深搜默认关闭，建议先按客户或进程灰度启用，并观察结果增量、重复率、延迟和 artifact 体积。",
+      ],
+    },
+    {
+      title: "迁移与兼容性提示",
+      items: [
+        "部署前需按顺序应用风险评审、搜索优化契约、反馈版本和运行血缘迁移；新增字段保持可空，旧数据无需批量回填。",
+      ],
+    },
+  ],
   "v1.23.1.preview": [
     {
       title: "新增",
