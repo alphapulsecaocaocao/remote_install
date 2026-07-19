@@ -70,7 +70,7 @@ type GitHubTree = {
   }>;
 };
 
-const FALLBACK_DELIVERY_TAG = "v1.23.2.preview";
+const FALLBACK_DELIVERY_TAG = "v1.24.0";
 const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
@@ -332,6 +332,45 @@ const CURATED_CHANGELOGS: Record<
   string,
   DeliveryChangelog["sections"]
 > = {
+  "v1.24.0": [
+    {
+      title: "新增",
+      items: [
+        "新增全局并发准入、任务租约和围栏写入机制，Agent Search 与快速搜索可在多实例运行时安全限制并行量并阻止过期任务继续写入。",
+        "新增 Agent Search 归档 generation 生命周期、对象存储校验和冲突隔离能力，为中断恢复、重复提交和归档回放提供可审计依据。",
+        "新增自动化服务就绪门禁、稳定性观测和管理员诊断能力，可集中查看并发容量、数据库等待、归档积压和实时刷新状态。",
+      ],
+    },
+    {
+      title: "改进",
+      items: [
+        "优化 Agent Search 与快速搜索的原子初始化、进度事件、状态原因和恢复队列，减少并发启动、服务重启和网络中断造成的重复执行或状态漂移。",
+        "优化搜索结果的轻量查询、游标分页、热读重试和自动刷新策略，降低高频轮询与 Realtime 订阅对数据库和前端的压力。",
+        "优化 Hermes run 幂等检查、归档回执和持久化写入流程，提升长任务重试与 Storage-first 恢复的可靠性。",
+      ],
+    },
+    {
+      title: "修复",
+      items: [
+        "修复租约丢失、旧进程恢复和待处理写入重放时可能覆盖新状态的问题；冲突记录会进入隔离证据，不再静默重复写入。",
+        "修复自动刷新、人工介入提示和搜索任务状态在断线重连或服务未就绪时显示不一致的问题。",
+      ],
+    },
+    {
+      title: "运维 / 配置",
+      items: [
+        "更新 Supabase 稳定性、并发容量、归档和 Hermes 幂等相关 `.env` 配置；生产部署需同步本次提供的 `.env` 文件。",
+        "自动化 API 必须通过就绪门禁启动；依赖未完成时业务接口会 fail closed，并返回可重试的 503 响应。",
+      ],
+    },
+    {
+      title: "迁移与兼容性提示",
+      items: [
+        "本版本包含并发索引、压缩、准入租约、原子控制、状态原因和归档 generation 等数据库迁移；远端只能通过安全发布入口按固定顺序执行，并保留审计回执。",
+        "归档 generation 回填与 schema 发布必须分开，先 dry-run 并人工核对后才能显式 apply；本次网站更新不会连接或修改客户托管数据库。",
+      ],
+    },
+  ],
   "v1.23.2.preview": [
     {
       title: "新增",
