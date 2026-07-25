@@ -47,10 +47,11 @@ Set these hosting environment variables:
 
 ```text
 NEXT_PUBLIC_SITE_URL=https://1688autoprocurement.xleeelx.online
-DELIVERY_DEFAULT_TAG=v1.25.0
+DELIVERY_DEFAULT_TAG=v1.26.0
 GITHUB_TOKEN=<repo read token>
 DELIVERY_ENV_FILE_CONTENT=<customer .env content>
 DELIVERY_ENV_FILE_CONTENT__V1_25_0=<customer .env content for v1.25.0>
+DELIVERY_ENV_FILE_CONTENT__V1_26_0=<customer .env content for v1.26.0>
 ```
 
 `GITHUB_TOKEN` is required when the delivery repository is private. It is used only server-side to resolve metadata and stream private tag archives through `/api/downloads/*`.
