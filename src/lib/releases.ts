@@ -70,7 +70,7 @@ type GitHubTree = {
   }>;
 };
 
-const FALLBACK_DELIVERY_TAG = "v1.25.0";
+const FALLBACK_DELIVERY_TAG = "v1.26.0";
 const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
@@ -332,6 +332,28 @@ const CURATED_CHANGELOGS: Record<
   string,
   DeliveryChangelog["sections"]
 > = {
+  "v1.26.0": [
+    {
+      title: "改进",
+      items: [
+        "本版本与 v1.25.0 使用相同的交付快照，作为 v1.26.0 重新发布与校验标签提供，不引入新的应用代码差异。",
+      ],
+    },
+    {
+      title: "运维 / 配置",
+      items: [
+        "为 v1.26.0 重新绑定并校验客户 `.env` 配置；安装器会通过受保护的部署环境变量获取本版本环境文件。",
+        "GitHub `releases/latest` 仍停留在旧版本，安装服务继续以真实 tag 列表判定 v1.26.0 为最新交付版本。",
+      ],
+    },
+    {
+      title: "迁移与兼容性提示",
+      items: [
+        "相较 v1.25.0，本版本文件树新增、修改和移除数量均为 0，无需执行额外数据库迁移。",
+        "从更早版本升级时，仍需完成 v1.25.0 已声明的数据库迁移与运行配置要求。",
+      ],
+    },
+  ],
   "v1.25.0": [
     {
       title: "新增",

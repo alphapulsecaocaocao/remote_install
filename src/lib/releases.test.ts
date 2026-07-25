@@ -9,14 +9,15 @@ describe("getLatestDeliveryVersion", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          tag_name: "v1.25.0",
+          tag_name: "v1.26.0",
           html_url:
-            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.25.0",
+            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.26.0",
         }),
       })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [
+          { name: "v1.26.0" },
           { name: "v1.25.0" },
           { name: "v1.24.0" },
           { name: "v1.23.2.preview" },
@@ -42,9 +43,9 @@ describe("getLatestDeliveryVersion", () => {
     );
     expect(latest).toMatchObject({
       source: "release",
-      tagName: "v1.25.0",
+      tagName: "v1.26.0",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.25.0",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.0",
     });
   });
 
@@ -62,6 +63,7 @@ describe("getLatestDeliveryVersion", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [
+          { name: "v1.26.0" },
           { name: "v1.25.0" },
           { name: "v1.24.0" },
           { name: "v1.23.2.preview" },
@@ -87,9 +89,9 @@ describe("getLatestDeliveryVersion", () => {
 
     expect(latest).toMatchObject({
       source: "tag",
-      tagName: "v1.25.0",
+      tagName: "v1.26.0",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.25.0",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.0",
     });
   });
 
@@ -128,9 +130,9 @@ describe("getLatestDeliveryVersion", () => {
 
     expect(latest).toMatchObject({
       source: "configured",
-      tagName: "v1.25.0",
+      tagName: "v1.26.0",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.25.0",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.0",
     });
   });
 });
@@ -140,6 +142,7 @@ describe("getDeliveryVersions", () => {
     const fetchMock = vi.fn(async (url: string) => {
       if (url.endsWith("/tags?per_page=100")) {
         return Response.json([
+          { name: "v1.26.0" },
           { name: "v1.25.0" },
           { name: "v1.24.0" },
           { name: "v1.23.2.preview" },
@@ -162,6 +165,15 @@ describe("getDeliveryVersions", () => {
           { name: "bad tag" },
           { name: "v1.16.0" },
         ]);
+      }
+
+      if (url.endsWith("/commits/v1.26.0")) {
+        return Response.json({
+          commit: {
+            author: { date: "2026-07-25T06:12:53Z" },
+            message: "delivery: 2026-07-25 snapshot from e0d9fb180d27",
+          },
+        });
       }
 
       if (url.endsWith("/commits/v1.25.0")) {
@@ -326,7 +338,10 @@ describe("getDeliveryVersions", () => {
         });
       }
 
-      if (url.endsWith("/git/trees/v1.25.0?recursive=1")) {
+      if (
+        url.endsWith("/git/trees/v1.26.0?recursive=1") ||
+        url.endsWith("/git/trees/v1.25.0?recursive=1")
+      ) {
         return Response.json({
           truncated: false,
           tree: [
@@ -909,13 +924,15 @@ describe("getDeliveryVersions", () => {
       return new Response("not found", { status: 404 });
     });
 
-    const versions = await getDeliveryVersions(fetchMock as typeof fetch);
+    const allVersions = await getDeliveryVersions(fetchMock as typeof fetch);
+    const versions = allVersions.slice(1);
 
     expect(fetchMock).toHaveBeenCalledWith(
       "https://api.github.com/repos/yueyue27418/1688-autoprocurement/tags?per_page=100",
       expect.any(Object),
     );
-    expect(versions.map((version) => version.tagName)).toEqual([
+    expect(allVersions.map((version) => version.tagName)).toEqual([
+      "v1.26.0",
       "v1.25.0",
       "v1.24.0",
       "v1.23.2.preview",
@@ -935,6 +952,39 @@ describe("getDeliveryVersions", () => {
       "v1.16.0",
       "v1.15.1",
     ]);
+    expect(allVersions[0]?.changelog.sections).toEqual([
+      {
+        title: "改进",
+        items: [
+          "本版本与 v1.25.0 使用相同的交付快照，作为 v1.26.0 重新发布与校验标签提供，不引入新的应用代码差异。",
+        ],
+      },
+      {
+        title: "运维 / 配置",
+        items: [
+          "为 v1.26.0 重新绑定并校验客户 `.env` 配置；安装器会通过受保护的部署环境变量获取本版本环境文件。",
+          "GitHub `releases/latest` 仍停留在旧版本，安装服务继续以真实 tag 列表判定 v1.26.0 为最新交付版本。",
+        ],
+      },
+      {
+        title: "迁移与兼容性提示",
+        items: [
+          "相较 v1.25.0，本版本文件树新增、修改和移除数量均为 0，无需执行额外数据库迁移。",
+          "从更早版本升级时，仍需完成 v1.25.0 已声明的数据库迁移与运行配置要求。",
+        ],
+      },
+    ]);
+    expect(allVersions[0]).toMatchObject({
+      changelog: {
+        previousTagName: "v1.25.0",
+        sourceCommit: "e0d9fb180d27",
+        totals: {
+          added: 0,
+          modified: 0,
+          removed: 0,
+        },
+      },
+    });
     expect(versions[0]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([

@@ -92,6 +92,7 @@ describe("createTagArchiveDownloadResponse", () => {
       )
       .mockResolvedValueOnce(
         Response.json([
+          { name: "v1.26.0" },
           { name: "v1.25.0" },
           { name: "v1.24.0" },
           { name: "v1.23.2.preview" },
@@ -116,7 +117,7 @@ describe("createTagArchiveDownloadResponse", () => {
     );
 
     expect(fetchMock).toHaveBeenLastCalledWith(
-      "https://api.github.com/repos/yueyue27418/1688-autoprocurement/tarball/v1.25.0",
+      "https://api.github.com/repos/yueyue27418/1688-autoprocurement/tarball/v1.26.0",
       expect.any(Object),
     );
     expect(response.status).toBe(200);
