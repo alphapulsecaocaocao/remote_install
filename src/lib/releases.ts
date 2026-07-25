@@ -70,7 +70,7 @@ type GitHubTree = {
   }>;
 };
 
-const FALLBACK_DELIVERY_TAG = "v1.25.0";
+const FALLBACK_DELIVERY_TAG = "v1.26.0";
 const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
@@ -332,6 +332,20 @@ const CURATED_CHANGELOGS: Record<
   string,
   DeliveryChangelog["sections"]
 > = {
+  "v1.26.0": [
+    {
+      title: "运维 / 配置",
+      items: [
+        "更新默认交付版本标识至 v1.26.0，并同步本次提供的客户 `.env` 配置；生产部署需更新受保护的环境变量后重新发布。",
+      ],
+    },
+    {
+      title: "迁移与兼容性提示",
+      items: [
+        "v1.26.0 与 v1.25.0 使用同一交付代码快照，本次升级不引入额外代码或数据库迁移；仍应按标准发布流程完成配置同步与安装验证。",
+      ],
+    },
+  ],
   "v1.25.0": [
     {
       title: "新增",

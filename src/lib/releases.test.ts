@@ -9,14 +9,15 @@ describe("getLatestDeliveryVersion", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          tag_name: "v1.25.0",
+          tag_name: "v1.26.0",
           html_url:
-            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.25.0",
+            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.26.0",
         }),
       })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [
+          { name: "v1.26.0" },
           { name: "v1.25.0" },
           { name: "v1.24.0" },
           { name: "v1.23.2.preview" },
@@ -42,9 +43,9 @@ describe("getLatestDeliveryVersion", () => {
     );
     expect(latest).toMatchObject({
       source: "release",
-      tagName: "v1.25.0",
+      tagName: "v1.26.0",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.25.0",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.0",
     });
   });
 
@@ -62,6 +63,7 @@ describe("getLatestDeliveryVersion", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [
+          { name: "v1.26.0" },
           { name: "v1.25.0" },
           { name: "v1.24.0" },
           { name: "v1.23.2.preview" },
@@ -87,9 +89,9 @@ describe("getLatestDeliveryVersion", () => {
 
     expect(latest).toMatchObject({
       source: "tag",
-      tagName: "v1.25.0",
+      tagName: "v1.26.0",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.25.0",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.0",
     });
   });
 
@@ -128,9 +130,9 @@ describe("getLatestDeliveryVersion", () => {
 
     expect(latest).toMatchObject({
       source: "configured",
-      tagName: "v1.25.0",
+      tagName: "v1.26.0",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.25.0",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.0",
     });
   });
 });
@@ -140,6 +142,7 @@ describe("getDeliveryVersions", () => {
     const fetchMock = vi.fn(async (url: string) => {
       if (url.endsWith("/tags?per_page=100")) {
         return Response.json([
+          { name: "v1.26.0" },
           { name: "v1.25.0" },
           { name: "v1.24.0" },
           { name: "v1.23.2.preview" },
@@ -162,6 +165,15 @@ describe("getDeliveryVersions", () => {
           { name: "bad tag" },
           { name: "v1.16.0" },
         ]);
+      }
+
+      if (url.endsWith("/commits/v1.26.0")) {
+        return Response.json({
+          commit: {
+            author: { date: "2026-07-25T06:12:53Z" },
+            message: "delivery: 2026-07-25 snapshot from e0d9fb180d27",
+          },
+        });
       }
 
       if (url.endsWith("/commits/v1.25.0")) {
@@ -323,6 +335,31 @@ describe("getDeliveryVersions", () => {
             author: { date: "2026-04-26T09:00:00Z" },
             message: "delivery: 2026-04-26 snapshot from 000000000000",
           },
+        });
+      }
+
+      if (url.endsWith("/git/trees/v1.26.0?recursive=1")) {
+        return Response.json({
+          truncated: false,
+          tree: [
+            { path: "automation/agent-search/README.md", sha: "agent-search-readme-v1250", type: "blob" },
+            { path: "automation/agent-search/scheduler.ts", sha: "agent-search-scheduler-v1240", type: "blob" },
+            { path: "automation/agent-search/routes.ts", sha: "agent-search-routes-v1250", type: "blob" },
+            { path: "automation/agent-search/risk.ts", sha: "agent-search-risk", type: "blob" },
+            { path: "automation/internal/server.ts", sha: "server-v1250", type: "blob" },
+            { path: "src/pages/AgentSearchResults.tsx", sha: "agent-search-results-v1250", type: "blob" },
+            { path: "automation/agent-search/run-lease.ts", sha: "agent-search-run-lease", type: "blob" },
+            { path: "automation/agent-search/archive-generation.ts", sha: "agent-search-archive-generation", type: "blob" },
+            { path: "automation/internal/global-permits.ts", sha: "automation-global-permits", type: "blob" },
+            { path: "src/components/shared/AutoRefreshIndicator.tsx", sha: "auto-refresh-indicator-v1250", type: "blob" },
+            { path: "supabase/migrations/20260717000100_agent_search_atomic_control.sql", sha: "agent-search-atomic-control-migration", type: "blob" },
+            { path: "automation/agent-search/card-grid-cache.ts", sha: "agent-search-card-grid-cache", type: "blob" },
+            { path: "automation/control/api-restart-admin-route.ts", sha: "api-restart-admin-route", type: "blob" },
+            { path: "automation/internal/pending-health-breaker.ts", sha: "pending-health-breaker", type: "blob" },
+            { path: "src/features/materials/lib/latestMaterialFile.ts", sha: "latest-material-file", type: "blob" },
+            { path: "supabase/migrations/20260719154534_expand_automation_permit_capacity_8_50_15.sql", sha: "permit-capacity-migration", type: "blob" },
+            { path: "supabase/migrations/20260722000100_agent_search_batch_reviews.sql", sha: "agent-search-batch-reviews-migration", type: "blob" },
+          ],
         });
       }
 
@@ -916,6 +953,7 @@ describe("getDeliveryVersions", () => {
       expect.any(Object),
     );
     expect(versions.map((version) => version.tagName)).toEqual([
+      "v1.26.0",
       "v1.25.0",
       "v1.24.0",
       "v1.23.2.preview",
@@ -936,12 +974,32 @@ describe("getDeliveryVersions", () => {
       "v1.15.1",
     ]);
     expect(versions[0]?.changelog.sections[0]).toMatchObject({
+      title: "运维 / 配置",
+      items: expect.arrayContaining([
+        "更新默认交付版本标识至 v1.26.0，并同步本次提供的客户 `.env` 配置；生产部署需更新受保护的环境变量后重新发布。",
+      ]),
+    });
+    expect(versions[0]).toMatchObject({
+      changelog: {
+        previousTagName: "v1.25.0",
+        sourceCommit: "e0d9fb180d27",
+        totals: {
+          added: 0,
+          modified: 0,
+          removed: 0,
+        },
+      },
+    });
+
+    const historicalVersions = versions.slice(1);
+
+    expect(historicalVersions[0]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增 Agent Search 搜索进度与商品审核一体化工作台，支持按全部轮次、初次搜索、失败重跑和标记重跑切换任务视图。",
       ]),
     });
-    expect(versions[0]).toMatchObject({
+    expect(historicalVersions[0]).toMatchObject({
       changelog: {
         previousTagName: "v1.24.0",
         sourceCommit: "e0d9fb180d27",
@@ -952,25 +1010,25 @@ describe("getDeliveryVersions", () => {
         },
       },
     });
-    expect(versions[1]?.changelog.sections[0]).toMatchObject({
+    expect(historicalVersions[1]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增全局并发准入、任务租约和围栏写入机制，Agent Search 与快速搜索可在多实例运行时安全限制并行量并阻止过期任务继续写入。",
       ]),
     });
-    expect(versions[1]).toMatchObject({
+    expect(historicalVersions[1]).toMatchObject({
       changelog: {
         previousTagName: "v1.23.2.preview",
         sourceCommit: "b7041b48fbd0",
       },
     });
-    expect(versions[2]?.changelog.sections[0]).toMatchObject({
+    expect(historicalVersions[2]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增 Agent Search 多轮深搜、采集预算和启动恢复能力，可按候选增量、供应商覆盖与资源上限持续补充结果。",
       ]),
     });
-    expect(versions[2]).toMatchObject({
+    expect(historicalVersions[2]).toMatchObject({
       changelog: {
         previousTagName: "v1.23.1.preview",
         sourceCommit: "4594ee6b2c82",
@@ -981,13 +1039,13 @@ describe("getDeliveryVersions", () => {
         },
       },
     });
-    expect(versions[3]?.changelog.sections[0]).toMatchObject({
+    expect(historicalVersions[3]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增 Agent Search family gates、风险评审和反馈记录能力，便于在搜索结果进入采购复核前先做质量筛选。",
       ]),
     });
-    expect(versions[3]).toMatchObject({
+    expect(historicalVersions[3]).toMatchObject({
       changelog: {
         previousTagName: "v1.23.0.preview",
         sourceCommit: "63df65d2d9f2",
@@ -998,13 +1056,13 @@ describe("getDeliveryVersions", () => {
         },
       },
     });
-    expect(versions[4]?.changelog.sections[0]).toMatchObject({
+    expect(historicalVersions[4]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增 Agent Search 独立搜索链路，支持按任务调度、并发控制、事件记录、结果归一化和报告导出。",
       ]),
     });
-    expect(versions[4]).toMatchObject({
+    expect(historicalVersions[4]).toMatchObject({
       changelog: {
         previousTagName: "v1.22.0.preview",
         sourceCommit: "f946153cf7c5",
@@ -1015,13 +1073,13 @@ describe("getDeliveryVersions", () => {
         },
       },
     });
-    expect(versions[5]?.changelog.sections[0]).toMatchObject({
+    expect(historicalVersions[5]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增快速搜索客户评估、离线案例批处理和覆盖率回归能力，便于持续校验采购搜索策略效果。",
       ]),
     });
-    expect(versions[5]).toMatchObject({
+    expect(historicalVersions[5]).toMatchObject({
       changelog: {
         previousTagName: "v1.21.1.preview",
         sourceCommit: "dcd00c887b48",
@@ -1032,13 +1090,13 @@ describe("getDeliveryVersions", () => {
         },
       },
     });
-    expect(versions[6]?.changelog.sections[0]).toMatchObject({
+    expect(historicalVersions[6]?.changelog.sections[0]).toMatchObject({
       title: "改进",
       items: expect.arrayContaining([
         "优化 1688 商品关键词识别 skill 和独立快速搜索流程的 manifest，同步补齐搜索意图生成测试。",
       ]),
     });
-    expect(versions[6]).toMatchObject({
+    expect(historicalVersions[6]).toMatchObject({
       changelog: {
         previousTagName: "v1.21.0.preview",
         sourceCommit: "43c6a69c5234",
@@ -1049,13 +1107,13 @@ describe("getDeliveryVersions", () => {
         },
       },
     });
-    expect(versions[7]?.changelog.sections[0]).toMatchObject({
+    expect(historicalVersions[7]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增快速搜索独立流程和结果页，支持从物料行发起搜索、跟踪运行事件、保存候选商品与联系人线索。",
       ]),
     });
-    expect(versions[7]).toMatchObject({
+    expect(historicalVersions[7]).toMatchObject({
       changelog: {
         previousTagName: "v1.20.0.preview",
         sourceCommit: "61e5e75542f3",
@@ -1066,13 +1124,13 @@ describe("getDeliveryVersions", () => {
         },
       },
     });
-    expect(versions[8]?.changelog.sections[0]).toMatchObject({
+    expect(historicalVersions[8]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增固定搜索工作流诊断封装，外部搜索、验证码、登录态和页面超时等阻断会沉淀为可追踪的任务结果。",
       ]),
     });
-    expect(versions[8]).toMatchObject({
+    expect(historicalVersions[8]).toMatchObject({
       changelog: {
         previousTagName: "v1.19.1.preview.alpha",
         sourceCommit: "3a29c8fbbeea",
@@ -1083,43 +1141,43 @@ describe("getDeliveryVersions", () => {
         },
       },
     });
-    expect(versions[9]?.changelog.sections[0]).toMatchObject({
+    expect(historicalVersions[9]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增项目内置 Hermes skill catalog，交付包自带 1688 关键词识别、商品链接查找和商品识别说明三类 skill。",
       ]),
     });
-    expect(versions[10]?.changelog.sections[0]).toMatchObject({
+    expect(historicalVersions[10]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增 Agentic Web Tools 和 Firecrawl 后端接入，可在受控开关下为标准化和搜索链路补充网页搜索与内容抽取证据。",
       ]),
     });
-    expect(versions[11]?.changelog.sections[0]).toMatchObject({
+    expect(historicalVersions[11]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增 AI 搜索词规划和固定搜索补抓词优化能力，基于标准化结果、命中率和拒绝原因生成更稳定的 1688 搜索词。",
       ]),
     });
-    expect(versions[12]?.changelog.sections[0]).toMatchObject({
+    expect(historicalVersions[12]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增空闲感知轮询策略，任务活跃时保持快速刷新，空闲或页面不可见时降低前端轮询压力。",
       ]),
     });
-    expect(versions[13]?.changelog.sections[0]).toMatchObject({
+    expect(historicalVersions[13]?.changelog.sections[0]).toMatchObject({
       title: "修复",
       items: expect.arrayContaining([
         "修复 1688 登录检测、人工验证会话和登录交接中的稳定性问题。",
       ]),
     });
-    expect(versions[14]?.changelog.sections[0]).toMatchObject({
+    expect(historicalVersions[14]?.changelog.sections[0]).toMatchObject({
       title: "新增",
       items: expect.arrayContaining([
         "新增持久化浏览器 profile、profile 锁和上下文管理能力，降低 1688 登录态丢失和并发冲突风险。",
       ]),
     });
-    expect(versions[15]).toMatchObject({
+    expect(historicalVersions[15]).toMatchObject({
       archiveUrl:
         "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.17.4.fix.alpha",
       htmlUrl:
@@ -1134,7 +1192,7 @@ describe("getDeliveryVersions", () => {
         },
       },
     });
-    expect(versions[15]?.changelog.sections).toEqual([
+    expect(historicalVersions[15]?.changelog.sections).toEqual([
       {
         title: "改进",
         items: [
@@ -1142,10 +1200,10 @@ describe("getDeliveryVersions", () => {
         ],
       },
     ]);
-    expect(JSON.stringify(versions[15]?.changelog.sections)).not.toContain(
+    expect(JSON.stringify(historicalVersions[15]?.changelog.sections)).not.toContain(
       "automation/",
     );
-    expect(versions[17]?.changelog.sections).toEqual([
+    expect(historicalVersions[17]?.changelog.sections).toEqual([
       {
         title: "新增",
         items: [
