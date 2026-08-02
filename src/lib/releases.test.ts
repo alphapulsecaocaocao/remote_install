@@ -9,14 +9,15 @@ describe("getLatestDeliveryVersion", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          tag_name: "v1.26.1",
+          tag_name: "v1.26.2",
           html_url:
-            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.26.1",
+            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.26.2",
         }),
       })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [
+          { name: "v1.26.2" },
           { name: "v1.26.1" },
           { name: "v1.26.0" },
           { name: "v1.25.0" },
@@ -44,9 +45,9 @@ describe("getLatestDeliveryVersion", () => {
     );
     expect(latest).toMatchObject({
       source: "release",
-      tagName: "v1.26.1",
+      tagName: "v1.26.2",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.1",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.2",
     });
   });
 
@@ -64,6 +65,7 @@ describe("getLatestDeliveryVersion", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [
+          { name: "v1.26.2" },
           { name: "v1.26.1" },
           { name: "v1.26.0" },
           { name: "v1.25.0" },
@@ -91,9 +93,9 @@ describe("getLatestDeliveryVersion", () => {
 
     expect(latest).toMatchObject({
       source: "tag",
-      tagName: "v1.26.1",
+      tagName: "v1.26.2",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.1",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.2",
     });
   });
 
@@ -132,9 +134,9 @@ describe("getLatestDeliveryVersion", () => {
 
     expect(latest).toMatchObject({
       source: "configured",
-      tagName: "v1.26.1",
+      tagName: "v1.26.2",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.1",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.2",
     });
   });
 });
@@ -144,6 +146,7 @@ describe("getDeliveryVersions", () => {
     const fetchMock = vi.fn(async (url: string) => {
       if (url.endsWith("/tags?per_page=100")) {
         return Response.json([
+          { name: "v1.26.2" },
           { name: "v1.26.1" },
           { name: "v1.26.0" },
           { name: "v1.25.0" },
@@ -168,6 +171,15 @@ describe("getDeliveryVersions", () => {
           { name: "bad tag" },
           { name: "v1.16.0" },
         ]);
+      }
+
+      if (url.endsWith("/commits/v1.26.2")) {
+        return Response.json({
+          commit: {
+            author: { date: "2026-08-02T09:59:47Z" },
+            message: "delivery: 2026-08-02 snapshot from d8e51132715f",
+          },
+        });
       }
 
       if (url.endsWith("/commits/v1.26.1")) {
@@ -375,6 +387,40 @@ describe("getDeliveryVersions", () => {
             { path: "automation/internal/source-files-storage-acl-repair.test.ts", sha: "source-files-storage-acl-repair-test", type: "blob" },
             { path: "supabase/migrations/20260801000100_repair_agent_search_archive_generation_acl.sql", sha: "archive-generation-acl-repair-migration", type: "blob" },
             { path: "supabase/migrations/20260801120554_repair_source_files_storage_acl.sql", sha: "source-files-storage-acl-repair-migration", type: "blob" },
+          ],
+        });
+      }
+
+      if (url.endsWith("/git/trees/v1.26.2?recursive=1")) {
+        return Response.json({
+          truncated: false,
+          tree: [
+            { path: "automation/agent-search/README.md", sha: "agent-search-readme-v1261", type: "blob" },
+            { path: "automation/agent-search/scheduler.ts", sha: "agent-search-scheduler-v1262", type: "blob" },
+            { path: "automation/agent-search/routes.ts", sha: "agent-search-routes-v1262", type: "blob" },
+            { path: "automation/agent-search/risk.ts", sha: "agent-search-risk-v1261", type: "blob" },
+            { path: "automation/internal/server.ts", sha: "server-v1262", type: "blob" },
+            { path: "src/pages/AgentSearchResults.tsx", sha: "agent-search-results-v1262", type: "blob" },
+            { path: "automation/agent-search/run-lease.ts", sha: "agent-search-run-lease-v1262", type: "blob" },
+            { path: "automation/agent-search/archive-generation.ts", sha: "agent-search-archive-generation-v1262", type: "blob" },
+            { path: "automation/internal/global-permits.ts", sha: "automation-global-permits-v1262", type: "blob" },
+            { path: "src/components/shared/AutoRefreshIndicator.tsx", sha: "auto-refresh-indicator-v1262", type: "blob" },
+            { path: "supabase/migrations/20260717000100_agent_search_atomic_control.sql", sha: "agent-search-atomic-control-migration-v1262", type: "blob" },
+            { path: "automation/agent-search/card-grid-cache.ts", sha: "agent-search-card-grid-cache-v1262", type: "blob" },
+            { path: "automation/control/api-restart-admin-route.ts", sha: "api-restart-admin-route-v1262", type: "blob" },
+            { path: "automation/internal/pending-health-breaker.ts", sha: "pending-health-breaker-v1262", type: "blob" },
+            { path: "src/features/materials/lib/latestMaterialFile.ts", sha: "latest-material-file", type: "blob" },
+            { path: "supabase/migrations/20260719154534_expand_automation_permit_capacity_8_50_15.sql", sha: "permit-capacity-migration-v1262", type: "blob" },
+            { path: "supabase/migrations/20260722000100_agent_search_batch_reviews.sql", sha: "agent-search-batch-reviews-migration-v1262", type: "blob" },
+            { path: "automation/internal/agent-search-archive-generation-acl-repair.test.ts", sha: "archive-generation-acl-repair-test-v1262", type: "blob" },
+            { path: "automation/internal/source-files-storage-acl-repair.test.ts", sha: "source-files-storage-acl-repair-test-v1262", type: "blob" },
+            { path: "supabase/migrations/20260801000100_repair_agent_search_archive_generation_acl.sql", sha: "archive-generation-acl-repair-migration-v1262", type: "blob" },
+            { path: "supabase/migrations/20260801120554_repair_source_files_storage_acl.sql", sha: "source-files-storage-acl-repair-migration-v1262", type: "blob" },
+            ...Array.from({ length: 266 }, (_, index) => ({
+              path: `delivery/v1.26.2-added-${index}.asset`,
+              sha: `v1262-added-${index}`,
+              type: "blob",
+            })),
           ],
         });
       }
@@ -966,13 +1012,14 @@ describe("getDeliveryVersions", () => {
     });
 
     const allVersions = await getDeliveryVersions(fetchMock as typeof fetch);
-    const versions = allVersions.slice(2);
+    const versions = allVersions.slice(3);
 
     expect(fetchMock).toHaveBeenCalledWith(
       "https://api.github.com/repos/yueyue27418/1688-autoprocurement/tags?per_page=100",
       expect.any(Object),
     );
     expect(allVersions.map((version) => version.tagName)).toEqual([
+      "v1.26.2",
       "v1.26.1",
       "v1.26.0",
       "v1.25.0",
@@ -996,40 +1043,48 @@ describe("getDeliveryVersions", () => {
     ]);
     expect(allVersions[0]?.changelog.sections).toEqual([
       {
+        title: "新增",
+        items: [
+          "新增 Agent Search 大批量物料分页浏览，进度列表和商品复核选择器支持上一页、下一页，并预取相邻页面以减少翻页等待。",
+          "交付包新增 AI 智采采购系统演示视频与示例采购清单，便于演示从物料上传、搜索进度到商品复核和反馈重跑的完整流程。",
+        ],
+      },
+      {
         title: "改进",
         items: [
-          "优化 Agent Search 商品卡复核读取和批量审核响应，只传输复核所需字段，并在保存后增量更新标记重跑摘要，减少大结果集下的重复拉取与界面刷新。",
+          "Agent Search 物料目录改为每页 100 条的游标查询；单轮任务按处理顺序稳定排序，并限制页面缓存数量，避免大批次一次性拉取过多数据。",
+          "优化联网搜索引擎组合与请求超时，优先启用 Brave、搜狗和 Yandex，并为外部搜索响应保留更充足的等待时间。",
         ],
       },
       {
         title: "修复",
         items: [
-          "修复数据库从结构与数据导出恢复后 Agent Search 归档 generation 表可能丢失 RPC-only 权限约束的问题，重新启用行级安全、收紧表权限并保留服务端 RPC 调用。",
-          "修复 `source-files` 私有存储桶对象策略缺失时，用户可能无法按所属采购批次访问源文件的问题；管理员和批次创建者权限会被安全重建。",
+          "修复数据库迁移历史已记录但 pending reconciler 定义仍为旧版本时，Agent Search 归档可能无法识别 `agent-db-pending` 写入的问题；新增前向修复与发布后检查。",
+          "加强自动化服务错误日志脱敏，环境变量中的 secret、token、password、API key 等敏感值会在记录前统一替换。",
         ],
       },
       {
         title: "运维 / 配置",
         items: [
-          "同步 v1.26.1 客户 `.env` 配置；安装器会在每次安装时通过受保护的部署环境变量刷新共享环境文件。",
-          "GitHub `releases/latest` 仍停留在 v1.24.0，安装服务继续以真实 tag 列表判定 v1.26.1 为最新交付版本。",
+          "同步 v1.26.2 客户 `.env` 配置；安装器会在每次安装时通过受保护的部署环境变量刷新共享环境文件。",
+          "GitHub `releases/latest` 仍停留在 v1.24.0，安装服务继续以真实 tag 列表判定 v1.26.2 为最新交付版本。",
         ],
       },
       {
         title: "迁移与兼容性提示",
         items: [
-          "本版本新增两项前向数据库访问控制修复迁移；升级时需按顺序应用并通过内置 postcheck，失败应中止发布。",
-          "本次网站更新不会连接或修改客户数据库；数据库迁移仍需在授权环境中由发布负责人显式执行。",
+          "本版本新增一项前向数据库修复迁移，不重写业务数据，并保留与 v1.26.1 的三字段预检协议以支持滚动升级。",
+          "升级时需应用新增迁移并通过内置 postcheck；本次网站更新不会连接或修改客户数据库。",
         ],
       },
     ]);
     expect(allVersions[0]).toMatchObject({
       changelog: {
-        previousTagName: "v1.26.0",
-        sourceCommit: "cffce75f98d5",
+        previousTagName: "v1.26.1",
+        sourceCommit: "d8e51132715f",
         totals: {
-          added: 4,
-          modified: 10,
+          added: 266,
+          modified: 18,
           removed: 0,
         },
       },
@@ -1037,16 +1092,16 @@ describe("getDeliveryVersions", () => {
     expect(allVersions[1]?.changelog.sections[0]).toMatchObject({
       title: "改进",
       items: expect.arrayContaining([
-        "本版本与 v1.25.0 使用相同的交付快照，作为 v1.26.0 重新发布与校验标签提供，不引入新的应用代码差异。",
+        "优化 Agent Search 商品卡复核读取和批量审核响应，只传输复核所需字段，并在保存后增量更新标记重跑摘要，减少大结果集下的重复拉取与界面刷新。",
       ]),
     });
     expect(allVersions[1]).toMatchObject({
       changelog: {
-        previousTagName: "v1.25.0",
-        sourceCommit: "e0d9fb180d27",
+        previousTagName: "v1.26.0",
+        sourceCommit: "cffce75f98d5",
         totals: {
-          added: 0,
-          modified: 0,
+          added: 4,
+          modified: 10,
           removed: 0,
         },
       },

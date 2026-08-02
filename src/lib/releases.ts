@@ -70,7 +70,7 @@ type GitHubTree = {
   }>;
 };
 
-const FALLBACK_DELIVERY_TAG = "v1.26.1";
+const FALLBACK_DELIVERY_TAG = "v1.26.2";
 const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
@@ -332,6 +332,43 @@ const CURATED_CHANGELOGS: Record<
   string,
   DeliveryChangelog["sections"]
 > = {
+  "v1.26.2": [
+    {
+      title: "新增",
+      items: [
+        "新增 Agent Search 大批量物料分页浏览，进度列表和商品复核选择器支持上一页、下一页，并预取相邻页面以减少翻页等待。",
+        "交付包新增 AI 智采采购系统演示视频与示例采购清单，便于演示从物料上传、搜索进度到商品复核和反馈重跑的完整流程。",
+      ],
+    },
+    {
+      title: "改进",
+      items: [
+        "Agent Search 物料目录改为每页 100 条的游标查询；单轮任务按处理顺序稳定排序，并限制页面缓存数量，避免大批次一次性拉取过多数据。",
+        "优化联网搜索引擎组合与请求超时，优先启用 Brave、搜狗和 Yandex，并为外部搜索响应保留更充足的等待时间。",
+      ],
+    },
+    {
+      title: "修复",
+      items: [
+        "修复数据库迁移历史已记录但 pending reconciler 定义仍为旧版本时，Agent Search 归档可能无法识别 `agent-db-pending` 写入的问题；新增前向修复与发布后检查。",
+        "加强自动化服务错误日志脱敏，环境变量中的 secret、token、password、API key 等敏感值会在记录前统一替换。",
+      ],
+    },
+    {
+      title: "运维 / 配置",
+      items: [
+        "同步 v1.26.2 客户 `.env` 配置；安装器会在每次安装时通过受保护的部署环境变量刷新共享环境文件。",
+        "GitHub `releases/latest` 仍停留在 v1.24.0，安装服务继续以真实 tag 列表判定 v1.26.2 为最新交付版本。",
+      ],
+    },
+    {
+      title: "迁移与兼容性提示",
+      items: [
+        "本版本新增一项前向数据库修复迁移，不重写业务数据，并保留与 v1.26.1 的三字段预检协议以支持滚动升级。",
+        "升级时需应用新增迁移并通过内置 postcheck；本次网站更新不会连接或修改客户数据库。",
+      ],
+    },
+  ],
   "v1.26.1": [
     {
       title: "改进",
