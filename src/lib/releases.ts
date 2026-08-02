@@ -70,7 +70,7 @@ type GitHubTree = {
   }>;
 };
 
-const FALLBACK_DELIVERY_TAG = "v1.26.0";
+const FALLBACK_DELIVERY_TAG = "v1.26.1";
 const MINIMUM_LISTED_DELIVERY_TAG = "v1.15.1";
 
 function getRequestInit() {
@@ -332,6 +332,35 @@ const CURATED_CHANGELOGS: Record<
   string,
   DeliveryChangelog["sections"]
 > = {
+  "v1.26.1": [
+    {
+      title: "改进",
+      items: [
+        "优化 Agent Search 商品卡复核读取和批量审核响应，只传输复核所需字段，并在保存后增量更新标记重跑摘要，减少大结果集下的重复拉取与界面刷新。",
+      ],
+    },
+    {
+      title: "修复",
+      items: [
+        "修复数据库从结构与数据导出恢复后 Agent Search 归档 generation 表可能丢失 RPC-only 权限约束的问题，重新启用行级安全、收紧表权限并保留服务端 RPC 调用。",
+        "修复 `source-files` 私有存储桶对象策略缺失时，用户可能无法按所属采购批次访问源文件的问题；管理员和批次创建者权限会被安全重建。",
+      ],
+    },
+    {
+      title: "运维 / 配置",
+      items: [
+        "同步 v1.26.1 客户 `.env` 配置；安装器会在每次安装时通过受保护的部署环境变量刷新共享环境文件。",
+        "GitHub `releases/latest` 仍停留在 v1.24.0，安装服务继续以真实 tag 列表判定 v1.26.1 为最新交付版本。",
+      ],
+    },
+    {
+      title: "迁移与兼容性提示",
+      items: [
+        "本版本新增两项前向数据库访问控制修复迁移；升级时需按顺序应用并通过内置 postcheck，失败应中止发布。",
+        "本次网站更新不会连接或修改客户数据库；数据库迁移仍需在授权环境中由发布负责人显式执行。",
+      ],
+    },
+  ],
   "v1.26.0": [
     {
       title: "改进",
