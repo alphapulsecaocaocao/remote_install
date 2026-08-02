@@ -9,14 +9,15 @@ describe("getLatestDeliveryVersion", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          tag_name: "v1.26.0",
+          tag_name: "v1.26.1",
           html_url:
-            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.26.0",
+            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.26.1",
         }),
       })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [
+          { name: "v1.26.1" },
           { name: "v1.26.0" },
           { name: "v1.25.0" },
           { name: "v1.24.0" },
@@ -43,9 +44,9 @@ describe("getLatestDeliveryVersion", () => {
     );
     expect(latest).toMatchObject({
       source: "release",
-      tagName: "v1.26.0",
+      tagName: "v1.26.1",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.0",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.1",
     });
   });
 
@@ -63,6 +64,7 @@ describe("getLatestDeliveryVersion", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [
+          { name: "v1.26.1" },
           { name: "v1.26.0" },
           { name: "v1.25.0" },
           { name: "v1.24.0" },
@@ -89,9 +91,9 @@ describe("getLatestDeliveryVersion", () => {
 
     expect(latest).toMatchObject({
       source: "tag",
-      tagName: "v1.26.0",
+      tagName: "v1.26.1",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.0",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.1",
     });
   });
 
@@ -130,9 +132,9 @@ describe("getLatestDeliveryVersion", () => {
 
     expect(latest).toMatchObject({
       source: "configured",
-      tagName: "v1.26.0",
+      tagName: "v1.26.1",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.0",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.1",
     });
   });
 });
@@ -142,6 +144,7 @@ describe("getDeliveryVersions", () => {
     const fetchMock = vi.fn(async (url: string) => {
       if (url.endsWith("/tags?per_page=100")) {
         return Response.json([
+          { name: "v1.26.1" },
           { name: "v1.26.0" },
           { name: "v1.25.0" },
           { name: "v1.24.0" },
@@ -165,6 +168,15 @@ describe("getDeliveryVersions", () => {
           { name: "bad tag" },
           { name: "v1.16.0" },
         ]);
+      }
+
+      if (url.endsWith("/commits/v1.26.1")) {
+        return Response.json({
+          commit: {
+            author: { date: "2026-08-02T06:56:08Z" },
+            message: "delivery: 2026-08-02 snapshot from cffce75f98d5",
+          },
+        });
       }
 
       if (url.endsWith("/commits/v1.26.0")) {
@@ -335,6 +347,35 @@ describe("getDeliveryVersions", () => {
             author: { date: "2026-04-26T09:00:00Z" },
             message: "delivery: 2026-04-26 snapshot from 000000000000",
           },
+        });
+      }
+
+      if (url.endsWith("/git/trees/v1.26.1?recursive=1")) {
+        return Response.json({
+          truncated: false,
+          tree: [
+            { path: "automation/agent-search/README.md", sha: "agent-search-readme-v1261", type: "blob" },
+            { path: "automation/agent-search/scheduler.ts", sha: "agent-search-scheduler-v1261", type: "blob" },
+            { path: "automation/agent-search/routes.ts", sha: "agent-search-routes-v1261", type: "blob" },
+            { path: "automation/agent-search/risk.ts", sha: "agent-search-risk-v1261", type: "blob" },
+            { path: "automation/internal/server.ts", sha: "server-v1261", type: "blob" },
+            { path: "src/pages/AgentSearchResults.tsx", sha: "agent-search-results-v1261", type: "blob" },
+            { path: "automation/agent-search/run-lease.ts", sha: "agent-search-run-lease-v1261", type: "blob" },
+            { path: "automation/agent-search/archive-generation.ts", sha: "agent-search-archive-generation-v1261", type: "blob" },
+            { path: "automation/internal/global-permits.ts", sha: "automation-global-permits-v1261", type: "blob" },
+            { path: "src/components/shared/AutoRefreshIndicator.tsx", sha: "auto-refresh-indicator-v1261", type: "blob" },
+            { path: "supabase/migrations/20260717000100_agent_search_atomic_control.sql", sha: "agent-search-atomic-control-migration", type: "blob" },
+            { path: "automation/agent-search/card-grid-cache.ts", sha: "agent-search-card-grid-cache", type: "blob" },
+            { path: "automation/control/api-restart-admin-route.ts", sha: "api-restart-admin-route", type: "blob" },
+            { path: "automation/internal/pending-health-breaker.ts", sha: "pending-health-breaker", type: "blob" },
+            { path: "src/features/materials/lib/latestMaterialFile.ts", sha: "latest-material-file", type: "blob" },
+            { path: "supabase/migrations/20260719154534_expand_automation_permit_capacity_8_50_15.sql", sha: "permit-capacity-migration", type: "blob" },
+            { path: "supabase/migrations/20260722000100_agent_search_batch_reviews.sql", sha: "agent-search-batch-reviews-migration", type: "blob" },
+            { path: "automation/internal/agent-search-archive-generation-acl-repair.test.ts", sha: "archive-generation-acl-repair-test", type: "blob" },
+            { path: "automation/internal/source-files-storage-acl-repair.test.ts", sha: "source-files-storage-acl-repair-test", type: "blob" },
+            { path: "supabase/migrations/20260801000100_repair_agent_search_archive_generation_acl.sql", sha: "archive-generation-acl-repair-migration", type: "blob" },
+            { path: "supabase/migrations/20260801120554_repair_source_files_storage_acl.sql", sha: "source-files-storage-acl-repair-migration", type: "blob" },
+          ],
         });
       }
 
@@ -925,13 +966,14 @@ describe("getDeliveryVersions", () => {
     });
 
     const allVersions = await getDeliveryVersions(fetchMock as typeof fetch);
-    const versions = allVersions.slice(1);
+    const versions = allVersions.slice(2);
 
     expect(fetchMock).toHaveBeenCalledWith(
       "https://api.github.com/repos/yueyue27418/1688-autoprocurement/tags?per_page=100",
       expect.any(Object),
     );
     expect(allVersions.map((version) => version.tagName)).toEqual([
+      "v1.26.1",
       "v1.26.0",
       "v1.25.0",
       "v1.24.0",
@@ -956,25 +998,49 @@ describe("getDeliveryVersions", () => {
       {
         title: "改进",
         items: [
-          "本版本与 v1.25.0 使用相同的交付快照，作为 v1.26.0 重新发布与校验标签提供，不引入新的应用代码差异。",
+          "优化 Agent Search 商品卡复核读取和批量审核响应，只传输复核所需字段，并在保存后增量更新标记重跑摘要，减少大结果集下的重复拉取与界面刷新。",
+        ],
+      },
+      {
+        title: "修复",
+        items: [
+          "修复数据库从结构与数据导出恢复后 Agent Search 归档 generation 表可能丢失 RPC-only 权限约束的问题，重新启用行级安全、收紧表权限并保留服务端 RPC 调用。",
+          "修复 `source-files` 私有存储桶对象策略缺失时，用户可能无法按所属采购批次访问源文件的问题；管理员和批次创建者权限会被安全重建。",
         ],
       },
       {
         title: "运维 / 配置",
         items: [
-          "为 v1.26.0 重新绑定并校验客户 `.env` 配置；安装器会通过受保护的部署环境变量获取本版本环境文件。",
-          "GitHub `releases/latest` 仍停留在旧版本，安装服务继续以真实 tag 列表判定 v1.26.0 为最新交付版本。",
+          "同步 v1.26.1 客户 `.env` 配置；安装器会在每次安装时通过受保护的部署环境变量刷新共享环境文件。",
+          "GitHub `releases/latest` 仍停留在 v1.24.0，安装服务继续以真实 tag 列表判定 v1.26.1 为最新交付版本。",
         ],
       },
       {
         title: "迁移与兼容性提示",
         items: [
-          "相较 v1.25.0，本版本文件树新增、修改和移除数量均为 0，无需执行额外数据库迁移。",
-          "从更早版本升级时，仍需完成 v1.25.0 已声明的数据库迁移与运行配置要求。",
+          "本版本新增两项前向数据库访问控制修复迁移；升级时需按顺序应用并通过内置 postcheck，失败应中止发布。",
+          "本次网站更新不会连接或修改客户数据库；数据库迁移仍需在授权环境中由发布负责人显式执行。",
         ],
       },
     ]);
     expect(allVersions[0]).toMatchObject({
+      changelog: {
+        previousTagName: "v1.26.0",
+        sourceCommit: "cffce75f98d5",
+        totals: {
+          added: 4,
+          modified: 10,
+          removed: 0,
+        },
+      },
+    });
+    expect(allVersions[1]?.changelog.sections[0]).toMatchObject({
+      title: "改进",
+      items: expect.arrayContaining([
+        "本版本与 v1.25.0 使用相同的交付快照，作为 v1.26.0 重新发布与校验标签提供，不引入新的应用代码差异。",
+      ]),
+    });
+    expect(allVersions[1]).toMatchObject({
       changelog: {
         previousTagName: "v1.25.0",
         sourceCommit: "e0d9fb180d27",
