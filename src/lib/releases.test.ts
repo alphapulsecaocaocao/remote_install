@@ -9,14 +9,15 @@ describe("getLatestDeliveryVersion", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          tag_name: "v1.26.2",
+          tag_name: "v1.26.3",
           html_url:
-            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.26.2",
+            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.26.3",
         }),
       })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [
+          { name: "v1.26.3" },
           { name: "v1.26.2" },
           { name: "v1.26.1" },
           { name: "v1.26.0" },
@@ -45,9 +46,9 @@ describe("getLatestDeliveryVersion", () => {
     );
     expect(latest).toMatchObject({
       source: "release",
-      tagName: "v1.26.2",
+      tagName: "v1.26.3",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.2",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.3",
     });
   });
 
@@ -65,6 +66,7 @@ describe("getLatestDeliveryVersion", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [
+          { name: "v1.26.3" },
           { name: "v1.26.2" },
           { name: "v1.26.1" },
           { name: "v1.26.0" },
@@ -93,9 +95,9 @@ describe("getLatestDeliveryVersion", () => {
 
     expect(latest).toMatchObject({
       source: "tag",
-      tagName: "v1.26.2",
+      tagName: "v1.26.3",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.2",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.3",
     });
   });
 
@@ -134,9 +136,9 @@ describe("getLatestDeliveryVersion", () => {
 
     expect(latest).toMatchObject({
       source: "configured",
-      tagName: "v1.26.2",
+      tagName: "v1.26.3",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.2",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.3",
     });
   });
 });
@@ -146,6 +148,7 @@ describe("getDeliveryVersions", () => {
     const fetchMock = vi.fn(async (url: string) => {
       if (url.endsWith("/tags?per_page=100")) {
         return Response.json([
+          { name: "v1.26.3" },
           { name: "v1.26.2" },
           { name: "v1.26.1" },
           { name: "v1.26.0" },
@@ -171,6 +174,15 @@ describe("getDeliveryVersions", () => {
           { name: "bad tag" },
           { name: "v1.16.0" },
         ]);
+      }
+
+      if (url.endsWith("/commits/v1.26.3")) {
+        return Response.json({
+          commit: {
+            author: { date: "2026-08-05T06:27:54Z" },
+            message: "delivery: 2026-08-05 snapshot from 5bc2dbf47c33",
+          },
+        });
       }
 
       if (url.endsWith("/commits/v1.26.2")) {
@@ -387,6 +399,42 @@ describe("getDeliveryVersions", () => {
             { path: "automation/internal/source-files-storage-acl-repair.test.ts", sha: "source-files-storage-acl-repair-test", type: "blob" },
             { path: "supabase/migrations/20260801000100_repair_agent_search_archive_generation_acl.sql", sha: "archive-generation-acl-repair-migration", type: "blob" },
             { path: "supabase/migrations/20260801120554_repair_source_files_storage_acl.sql", sha: "source-files-storage-acl-repair-migration", type: "blob" },
+          ],
+        });
+      }
+
+      if (url.endsWith("/git/trees/v1.26.3?recursive=1")) {
+        return Response.json({
+          truncated: false,
+          tree: [
+            { path: "automation/agent-search/README.md", sha: "agent-search-readme-v1261", type: "blob" },
+            { path: "automation/agent-search/scheduler.ts", sha: "agent-search-scheduler-v1262", type: "blob" },
+            { path: "automation/agent-search/routes.ts", sha: "agent-search-routes-v1263", type: "blob" },
+            { path: "automation/agent-search/risk.ts", sha: "agent-search-risk-v1261", type: "blob" },
+            { path: "automation/internal/server.ts", sha: "server-v1263", type: "blob" },
+            { path: "src/pages/AgentSearchResults.tsx", sha: "agent-search-results-v1263", type: "blob" },
+            { path: "automation/agent-search/run-lease.ts", sha: "agent-search-run-lease-v1263", type: "blob" },
+            { path: "automation/agent-search/archive-generation.ts", sha: "agent-search-archive-generation-v1263", type: "blob" },
+            { path: "automation/internal/global-permits.ts", sha: "automation-global-permits-v1263", type: "blob" },
+            { path: "src/components/shared/AutoRefreshIndicator.tsx", sha: "auto-refresh-indicator-v1263", type: "blob" },
+            { path: "supabase/migrations/20260717000100_agent_search_atomic_control.sql", sha: "agent-search-atomic-control-migration-v1263", type: "blob" },
+            { path: "automation/agent-search/card-grid-cache.ts", sha: "agent-search-card-grid-cache-v1262", type: "blob" },
+            { path: "automation/control/api-restart-admin-route.ts", sha: "api-restart-admin-route-v1262", type: "blob" },
+            { path: "automation/internal/pending-health-breaker.ts", sha: "pending-health-breaker-v1262", type: "blob" },
+            { path: "src/features/materials/lib/latestMaterialFile.ts", sha: "latest-material-file", type: "blob" },
+            { path: "supabase/migrations/20260719154534_expand_automation_permit_capacity_8_50_15.sql", sha: "permit-capacity-migration-v1262", type: "blob" },
+            { path: "supabase/migrations/20260722000100_agent_search_batch_reviews.sql", sha: "agent-search-batch-reviews-migration-v1262", type: "blob" },
+            { path: "automation/internal/agent-search-archive-generation-acl-repair.test.ts", sha: "archive-generation-acl-repair-test-v1262", type: "blob" },
+            { path: "automation/internal/source-files-storage-acl-repair.test.ts", sha: "source-files-storage-acl-repair-test-v1262", type: "blob" },
+            { path: "supabase/migrations/20260801000100_repair_agent_search_archive_generation_acl.sql", sha: "archive-generation-acl-repair-migration-v1262", type: "blob" },
+            { path: "supabase/migrations/20260801120554_repair_source_files_storage_acl.sql", sha: "source-files-storage-acl-repair-migration-v1262", type: "blob" },
+            { path: "supabase/migrations/20260804000100_agent_search_review_compare_and_set.sql", sha: "agent-search-review-compare-and-set-migration-v1263", type: "blob" },
+            { path: "supabase/migrations/20260804000200_restore_agent_search_unconditional_reviews.sql", sha: "agent-search-review-restore-migration-v1263", type: "blob" },
+            ...Array.from({ length: 266 }, (_, index) => ({
+              path: `delivery/v1.26.2-added-${index}.asset`,
+              sha: `v1262-added-${index}`,
+              type: "blob",
+            })),
           ],
         });
       }
@@ -1012,13 +1060,14 @@ describe("getDeliveryVersions", () => {
     });
 
     const allVersions = await getDeliveryVersions(fetchMock as typeof fetch);
-    const versions = allVersions.slice(3);
+    const versions = allVersions.slice(4);
 
     expect(fetchMock).toHaveBeenCalledWith(
       "https://api.github.com/repos/yueyue27418/1688-autoprocurement/tags?per_page=100",
       expect.any(Object),
     );
     expect(allVersions.map((version) => version.tagName)).toEqual([
+      "v1.26.3",
       "v1.26.2",
       "v1.26.1",
       "v1.26.0",
@@ -1045,57 +1094,56 @@ describe("getDeliveryVersions", () => {
       {
         title: "新增",
         items: [
-          "新增 Agent Search 大批量物料分页浏览，进度列表和商品复核选择器支持上一页、下一页，并预取相邻页面以减少翻页等待。",
-          "交付包新增 AI 智采采购系统演示视频与示例采购清单，便于演示从物料上传、搜索进度到商品复核和反馈重跑的完整流程。",
+          "Agent Search 商品卡复核新增“非驳回率（含未标记）”指标，与严格准确率并列展示，便于同时判断人工确认质量和候选可用覆盖。",
         ],
       },
       {
         title: "改进",
         items: [
-          "Agent Search 物料目录改为每页 100 条的游标查询；单轮任务按处理顺序稳定排序，并限制页面缓存数量，避免大批次一次性拉取过多数据。",
-          "优化联网搜索引擎组合与请求超时，优先启用 Brave、搜狗和 Yandex，并为外部搜索响应保留更充足的等待时间。",
+          "未标记的候选商品卡进入复核面板后默认设为确认，并取消延迟自动保存，统一由“保存商品卡标记”显式批量提交，连续复核时状态更可控。",
+          "精简 Agent Search 结果列表查询，不再随列表传输大块诊断数据；当前物料短缺改由请求数和结果数直接计算，降低大批量复核时的数据传输与渲染开销。",
         ],
       },
       {
         title: "修复",
         items: [
-          "修复数据库迁移历史已记录但 pending reconciler 定义仍为旧版本时，Agent Search 归档可能无法识别 `agent-db-pending` 写入的问题；新增前向修复与发布后检查。",
-          "加强自动化服务错误日志脱敏，环境变量中的 secret、token、password、API key 等敏感值会在记录前统一替换。",
+          "商品卡复核读取与批量审核现在只处理候选结果，避免历史或非候选记录混入复核网格并被错误标记。",
+          "修复短暂并发写入保护迁移与显式保存语义不一致的问题；补充前向恢复迁移，使已应用中间版本的数据库回到明确的最后一次保存生效行为。",
         ],
       },
       {
         title: "运维 / 配置",
         items: [
-          "同步 v1.26.2 客户 `.env` 配置；安装器会在每次安装时通过受保护的部署环境变量刷新共享环境文件。",
-          "GitHub `releases/latest` 仍停留在 v1.24.0，安装服务继续以真实 tag 列表判定 v1.26.2 为最新交付版本。",
+          "同步 v1.26.3 客户 `.env` 配置；安装器会在每次安装时通过受保护的部署环境变量刷新共享环境文件。",
+          "GitHub `releases/latest` 仍停留在 v1.24.0，安装服务继续以真实 tag 列表判定 v1.26.3 为最新交付版本。",
         ],
       },
       {
         title: "迁移与兼容性提示",
         items: [
-          "本版本新增一项前向数据库修复迁移，不重写业务数据，并保留与 v1.26.1 的三字段预检协议以支持滚动升级。",
-          "升级时需应用新增迁移并通过内置 postcheck；本次网站更新不会连接或修改客户数据库。",
+          "本版本新增两项 Agent Search 批量审核函数迁移，升级时需按顺序应用；第二项兼容已应用短暂中间迁移的数据库，并恢复显式批量保存语义。",
+          "本次网站更新不会连接或修改客户数据库；数据库迁移仍需在授权环境中由发布负责人显式执行。",
         ],
       },
     ]);
     expect(allVersions[0]).toMatchObject({
       changelog: {
-        previousTagName: "v1.26.1",
-        sourceCommit: "d8e51132715f",
+        previousTagName: "v1.26.2",
+        sourceCommit: "5bc2dbf47c33",
         totals: {
-          added: 266,
-          modified: 18,
+          added: 2,
+          modified: 8,
           removed: 0,
         },
       },
     });
-    expect(allVersions[1]?.changelog.sections[0]).toMatchObject({
+    expect(allVersions[2]?.changelog.sections[0]).toMatchObject({
       title: "改进",
       items: expect.arrayContaining([
         "优化 Agent Search 商品卡复核读取和批量审核响应，只传输复核所需字段，并在保存后增量更新标记重跑摘要，减少大结果集下的重复拉取与界面刷新。",
       ]),
     });
-    expect(allVersions[1]).toMatchObject({
+    expect(allVersions[2]).toMatchObject({
       changelog: {
         previousTagName: "v1.26.0",
         sourceCommit: "cffce75f98d5",
