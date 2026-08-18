@@ -55,3 +55,4 @@ DELIVERY_ENV_FILE_CONTENT__V1_25_0=<customer .env content for v1.25.0>
 
 `GITHUB_TOKEN` is required when the delivery repository is private. It is used only server-side to resolve metadata and stream private tag archives through `/api/downloads/*`.
 `DELIVERY_ENV_FILE_CONTENT__<NORMALIZED_TAG>` is used server-side by `/api/downloads/tags/<tag>/env` when a tag-specific env file is needed. `DELIVERY_ENV_FILE_CONTENT` remains the generic fallback. Both should be configured as protected deployment environment variables, not committed to Git.
+
