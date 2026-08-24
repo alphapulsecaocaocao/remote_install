@@ -3,7 +3,13 @@ import { describe, expect, it, vi } from "vitest";
 import { getDeliveryVersions, getLatestDeliveryVersion } from "./releases";
 
 function buildNewReleaseTestTree(
-  tagName: "v1.26.4" | "v1.26.5" | "v1.26.6",
+  tagName:
+    | "v1.26.4"
+    | "v1.26.5"
+    | "v1.26.6"
+    | "v1.26.7"
+    | "v1.26.8"
+    | "v1.26.9",
 ) {
   const v1263Tree = [
     { path: "automation/agent-search/README.md", sha: "agent-search-readme-v1261", type: "blob" },
@@ -58,9 +64,34 @@ function buildNewReleaseTestTree(
   ];
   if (tagName === "v1.26.5") return v1265Tree;
 
-  return v1265Tree.map((entry, index) => (
+  const v1266Tree = v1265Tree.map((entry, index) => (
     index < 23 ? { ...entry, sha: `${entry.sha}-v1266` } : entry
   ));
+  if (tagName === "v1.26.6") return v1266Tree;
+
+  const v1267Tree = v1266Tree.map((entry, index) => (
+    index < 28 ? { ...entry, sha: `${entry.sha}-v1267` } : entry
+  ));
+  if (tagName === "v1.26.7") return v1267Tree;
+
+  const v1268Tree = [
+    ...v1267Tree.slice(189).map((entry, index) => (
+      index < 26 ? { ...entry, sha: `${entry.sha}-v1268` } : entry
+    )),
+    { path: ".gitattributes", sha: "gitattributes-v1268", type: "blob" },
+  ];
+  if (tagName === "v1.26.8") return v1268Tree;
+
+  return [
+    ...v1268Tree.map((entry, index) => (
+      index < 31 ? { ...entry, sha: `${entry.sha}-v1269` } : entry
+    )),
+    ...Array.from({ length: 7 }, (_, index) => ({
+      path: `delivery/v1.26.9-added-${index}.asset`,
+      sha: `v1269-added-${index}`,
+      type: "blob",
+    })),
+  ];
 }
 
 describe("getLatestDeliveryVersion", () => {
@@ -70,14 +101,17 @@ describe("getLatestDeliveryVersion", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          tag_name: "v1.26.6",
+          tag_name: "v1.26.9",
           html_url:
-            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.26.6",
+            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.26.9",
         }),
       })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [
+          { name: "v1.26.9" },
+          { name: "v1.26.8" },
+          { name: "v1.26.7" },
           { name: "v1.26.6" },
           { name: "v1.26.5" },
           { name: "v1.26.4" },
@@ -110,9 +144,9 @@ describe("getLatestDeliveryVersion", () => {
     );
     expect(latest).toMatchObject({
       source: "release",
-      tagName: "v1.26.6",
+      tagName: "v1.26.9",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.6",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.9",
     });
   });
 
@@ -130,6 +164,9 @@ describe("getLatestDeliveryVersion", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [
+          { name: "v1.26.9" },
+          { name: "v1.26.8" },
+          { name: "v1.26.7" },
           { name: "v1.26.6" },
           { name: "v1.26.5" },
           { name: "v1.26.4" },
@@ -162,9 +199,9 @@ describe("getLatestDeliveryVersion", () => {
 
     expect(latest).toMatchObject({
       source: "tag",
-      tagName: "v1.26.6",
+      tagName: "v1.26.9",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.6",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.9",
     });
   });
 
@@ -203,9 +240,9 @@ describe("getLatestDeliveryVersion", () => {
 
     expect(latest).toMatchObject({
       source: "configured",
-      tagName: "v1.26.6",
+      tagName: "v1.26.9",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.6",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.9",
     });
   });
 });
@@ -215,6 +252,9 @@ describe("getDeliveryVersions", () => {
     const fetchMock = vi.fn(async (url: string) => {
       if (url.endsWith("/tags?per_page=100")) {
         return Response.json([
+          { name: "v1.26.9" },
+          { name: "v1.26.8" },
+          { name: "v1.26.7" },
           { name: "v1.26.6" },
           { name: "v1.26.5" },
           { name: "v1.26.4" },
@@ -244,6 +284,33 @@ describe("getDeliveryVersions", () => {
           { name: "bad tag" },
           { name: "v1.16.0" },
         ]);
+      }
+
+      if (url.endsWith("/commits/v1.26.9")) {
+        return Response.json({
+          commit: {
+            author: { date: "2026-08-24T16:24:26Z" },
+            message: "delivery: 2026-08-25 snapshot from df400e764981",
+          },
+        });
+      }
+
+      if (url.endsWith("/commits/v1.26.8")) {
+        return Response.json({
+          commit: {
+            author: { date: "2026-08-24T02:40:39Z" },
+            message: "delivery: 2026-08-24 snapshot from fde286030934",
+          },
+        });
+      }
+
+      if (url.endsWith("/commits/v1.26.7")) {
+        return Response.json({
+          commit: {
+            author: { date: "2026-08-23T16:50:48Z" },
+            message: "delivery: 2026-08-24 snapshot from 132c7d80de96",
+          },
+        });
       }
 
       if (url.endsWith("/commits/v1.26.6")) {
@@ -501,13 +568,19 @@ describe("getDeliveryVersions", () => {
       }
 
       const newReleaseTreeMatch = url.match(
-        /\/git\/trees\/(v1\.26\.[456])\?recursive=1$/,
+        /\/git\/trees\/(v1\.26\.[456789])\?recursive=1$/,
       );
       if (newReleaseTreeMatch) {
         return Response.json({
           truncated: false,
           tree: buildNewReleaseTestTree(
-            newReleaseTreeMatch[1] as "v1.26.4" | "v1.26.5" | "v1.26.6",
+            newReleaseTreeMatch[1] as
+              | "v1.26.4"
+              | "v1.26.5"
+              | "v1.26.6"
+              | "v1.26.7"
+              | "v1.26.8"
+              | "v1.26.9",
           ),
         });
       }
@@ -1169,13 +1242,17 @@ describe("getDeliveryVersions", () => {
     });
 
     const allVersions = await getDeliveryVersions(fetchMock as typeof fetch);
-    const versions = allVersions.slice(7);
+    const priorVersions = allVersions.slice(3);
+    const versions = allVersions.slice(10);
 
     expect(fetchMock).toHaveBeenCalledWith(
       "https://api.github.com/repos/yueyue27418/1688-autoprocurement/tags?per_page=100",
       expect.any(Object),
     );
     expect(allVersions.map((version) => version.tagName)).toEqual([
+      "v1.26.9",
+      "v1.26.8",
+      "v1.26.7",
       "v1.26.6",
       "v1.26.5",
       "v1.26.4",
@@ -1212,11 +1289,70 @@ describe("getDeliveryVersions", () => {
     expect(
       allVersions[0]?.changelog.sections.flatMap((section) => section.items),
     ).toEqual(expect.arrayContaining([
+      "Agent Search 新增原子停止控制：停止任务时会在同一数据库事务中撤销运行租约与全局并发许可、终止待处理项目，并返回需要关闭的 Hermes 远端运行清单。",
+      "修复本地任务已进入失败或停止状态、但远端 Hermes 运行仍可能继续执行的问题；跨实例停止现在可从数据库恢复远端运行标识。",
+      "同步 v1.26.9 客户 `.env` 配置；安装器会在每次安装时通过受保护的部署环境变量刷新共享环境文件。",
+    ]));
+    expect(allVersions[0]).toMatchObject({
+      changelog: {
+        previousTagName: "v1.26.8",
+        sourceCommit: "df400e764981",
+        totals: {
+          added: 7,
+          modified: 31,
+          removed: 0,
+        },
+      },
+    });
+    expect(
+      allVersions[1]?.changelog.sections.flatMap((section) => section.items),
+    ).toEqual(expect.arrayContaining([
+      "演示视频的图片、语音、背景音乐和字体资源改由 Git LFS 管理，并清理渲染成品、缩略图、波形缓存和重复采集素材，降低交付仓库体积与拉取压力。",
+      "补充演示媒体的 LFS 跟踪规则与生成物忽略规则；本版本未修改网站或自动化服务运行时代码。",
+    ]));
+    expect(allVersions[1]).toMatchObject({
+      changelog: {
+        previousTagName: "v1.26.7",
+        sourceCommit: "fde286030934",
+        totals: {
+          added: 1,
+          modified: 26,
+          removed: 189,
+        },
+      },
+    });
+    expect(
+      allVersions[2]?.changelog.sections.flatMap((section) => section.items),
+    ).toEqual(expect.arrayContaining([
+      "自动化服务在持久化待处理数据回放期间新增受控只读模式：认证通过的 API GET/HEAD 请求可继续读取 Supabase 数据，写入请求仍保持关闭。",
+      "修复归档运行时已就绪但 pending 健康数据缺失或过期时仍可能放行新任务的问题；未知健康状态现在会 fail closed。",
+    ]));
+    expect(allVersions[2]).toMatchObject({
+      changelog: {
+        previousTagName: "v1.26.6",
+        sourceCommit: "132c7d80de96",
+        totals: {
+          added: 0,
+          modified: 28,
+          removed: 0,
+        },
+      },
+    });
+    expect(priorVersions[0]?.changelog.sections.map((section) => section.title)).toEqual([
+      "新增",
+      "改进",
+      "修复",
+      "运维 / 配置",
+      "迁移与兼容性提示",
+    ]);
+    expect(
+      priorVersions[0]?.changelog.sections.flatMap((section) => section.items),
+    ).toEqual(expect.arrayContaining([
       "搜索进度页和目录接口统一使用服务端全批次汇总，分页、刷新和“仅看异常”都会展示一致的总数及进行中、等待、完成、异常和可重跑数量。",
       "完成任务携带的风险摘要、人工复核提示或候选不足说明不再被误计为执行失败；异常重跑只接受真正失败或已停止的物料。",
       "同步 v1.26.6 客户 `.env` 配置；安装器会在每次安装时通过受保护的部署环境变量刷新共享环境文件。",
     ]));
-    expect(allVersions[0]).toMatchObject({
+    expect(priorVersions[0]).toMatchObject({
       changelog: {
         previousTagName: "v1.26.5",
         sourceCommit: "005f147d28a6",
@@ -1228,12 +1364,12 @@ describe("getDeliveryVersions", () => {
       },
     });
     expect(
-      allVersions[1]?.changelog.sections.flatMap((section) => section.items),
+      priorVersions[1]?.changelog.sections.flatMap((section) => section.items),
     ).toEqual(expect.arrayContaining([
       "Agent Search 结果新增“完全匹配”“疑似商家”和“不纳入结果”三类可信分层，结果页、进度页、商品卡复核和 Excel 导出都会展示分类原因与短缺提醒。",
       "交付包新增生产数据库 schema baseline 与结构指纹查询，便于部署前核对客户数据库结构并形成可复查的基线证据。",
     ]));
-    expect(allVersions[1]).toMatchObject({
+    expect(priorVersions[1]).toMatchObject({
       changelog: {
         previousTagName: "v1.26.4",
         sourceCommit: "d4c4f7fb2cbe",
@@ -1245,12 +1381,12 @@ describe("getDeliveryVersions", () => {
       },
     });
     expect(
-      allVersions[2]?.changelog.sections.flatMap((section) => section.items),
+      priorVersions[2]?.changelog.sections.flatMap((section) => section.items),
     ).toEqual(expect.arrayContaining([
       "Agent Search 商品审核新增未保存、保存中、保存失败和已保存状态；暂时性故障时保留页面草稿，并按失败原因提供可恢复的重试路径。",
       "超大批量重搜使用固定长度清单指纹并在服务端再次校验当前资格，避免超过 ID 数量上限或并发标记变化造成执行清单不一致。",
     ]));
-    expect(allVersions[2]).toMatchObject({
+    expect(priorVersions[2]).toMatchObject({
       changelog: {
         previousTagName: "v1.26.3",
         sourceCommit: "37711210cfbb",
@@ -1261,7 +1397,7 @@ describe("getDeliveryVersions", () => {
         },
       },
     });
-    expect(allVersions[3]?.changelog.sections).toEqual([
+    expect(priorVersions[3]?.changelog.sections).toEqual([
       {
         title: "新增",
         items: [
@@ -1297,7 +1433,7 @@ describe("getDeliveryVersions", () => {
         ],
       },
     ]);
-    expect(allVersions[3]).toMatchObject({
+    expect(priorVersions[3]).toMatchObject({
       changelog: {
         previousTagName: "v1.26.2",
         sourceCommit: "5bc2dbf47c33",
@@ -1308,13 +1444,13 @@ describe("getDeliveryVersions", () => {
         },
       },
     });
-    expect(allVersions[5]?.changelog.sections[0]).toMatchObject({
+    expect(priorVersions[5]?.changelog.sections[0]).toMatchObject({
       title: "改进",
       items: expect.arrayContaining([
         "优化 Agent Search 商品卡复核读取和批量审核响应，只传输复核所需字段，并在保存后增量更新标记重跑摘要，减少大结果集下的重复拉取与界面刷新。",
       ]),
     });
-    expect(allVersions[5]).toMatchObject({
+    expect(priorVersions[5]).toMatchObject({
       changelog: {
         previousTagName: "v1.26.0",
         sourceCommit: "cffce75f98d5",
