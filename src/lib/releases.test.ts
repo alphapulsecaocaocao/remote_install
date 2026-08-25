@@ -9,7 +9,8 @@ function buildNewReleaseTestTree(
     | "v1.26.6"
     | "v1.26.7"
     | "v1.26.8"
-    | "v1.26.9",
+    | "v1.26.9"
+    | "v1.26.10",
 ) {
   const v1263Tree = [
     { path: "automation/agent-search/README.md", sha: "agent-search-readme-v1261", type: "blob" },
@@ -82,7 +83,7 @@ function buildNewReleaseTestTree(
   ];
   if (tagName === "v1.26.8") return v1268Tree;
 
-  return [
+  const v1269Tree = [
     ...v1268Tree.map((entry, index) => (
       index < 31 ? { ...entry, sha: `${entry.sha}-v1269` } : entry
     )),
@@ -91,6 +92,15 @@ function buildNewReleaseTestTree(
       sha: `v1269-added-${index}`,
       type: "blob",
     })),
+  ];
+  if (tagName === "v1.26.9") return v1269Tree;
+
+  return [
+    ...v1269Tree.map((entry, index) => (
+      index < 14 ? { ...entry, sha: `${entry.sha}-v12610` } : entry
+    )),
+    { path: "src/services/batchService.test.ts", sha: "batch-service-test-v12610", type: "blob" },
+    { path: "src/services/materialService.test.ts", sha: "material-service-test-v12610", type: "blob" },
   ];
 }
 
@@ -101,14 +111,15 @@ describe("getLatestDeliveryVersion", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          tag_name: "v1.26.9",
+          tag_name: "v1.26.10",
           html_url:
-            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.26.9",
+            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.26.10",
         }),
       })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [
+          { name: "v1.26.10" },
           { name: "v1.26.9" },
           { name: "v1.26.8" },
           { name: "v1.26.7" },
@@ -144,9 +155,9 @@ describe("getLatestDeliveryVersion", () => {
     );
     expect(latest).toMatchObject({
       source: "release",
-      tagName: "v1.26.9",
+      tagName: "v1.26.10",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.9",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.10",
     });
   });
 
@@ -156,14 +167,15 @@ describe("getLatestDeliveryVersion", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          tag_name: "v1.24.0",
+          tag_name: "v1.26.9",
           html_url:
-            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.24.0",
+            "https://github.com/yueyue27418/1688-autoprocurement/releases/tag/v1.26.9",
         }),
       })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [
+          { name: "v1.26.10" },
           { name: "v1.26.9" },
           { name: "v1.26.8" },
           { name: "v1.26.7" },
@@ -199,9 +211,9 @@ describe("getLatestDeliveryVersion", () => {
 
     expect(latest).toMatchObject({
       source: "tag",
-      tagName: "v1.26.9",
+      tagName: "v1.26.10",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.9",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.10",
     });
   });
 
@@ -240,9 +252,9 @@ describe("getLatestDeliveryVersion", () => {
 
     expect(latest).toMatchObject({
       source: "configured",
-      tagName: "v1.26.9",
+      tagName: "v1.26.10",
       archiveUrl:
-        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.9",
+        "https://1688autoprocurement.xleeelx.online/api/downloads/tags/v1.26.10",
     });
   });
 });
@@ -252,6 +264,7 @@ describe("getDeliveryVersions", () => {
     const fetchMock = vi.fn(async (url: string) => {
       if (url.endsWith("/tags?per_page=100")) {
         return Response.json([
+          { name: "v1.26.10" },
           { name: "v1.26.9" },
           { name: "v1.26.8" },
           { name: "v1.26.7" },
@@ -284,6 +297,15 @@ describe("getDeliveryVersions", () => {
           { name: "bad tag" },
           { name: "v1.16.0" },
         ]);
+      }
+
+      if (url.endsWith("/commits/v1.26.10")) {
+        return Response.json({
+          commit: {
+            author: { date: "2026-08-25T04:22:53Z" },
+            message: "delivery: 2026-08-25 snapshot from dde6f8733fc8",
+          },
+        });
       }
 
       if (url.endsWith("/commits/v1.26.9")) {
@@ -568,7 +590,7 @@ describe("getDeliveryVersions", () => {
       }
 
       const newReleaseTreeMatch = url.match(
-        /\/git\/trees\/(v1\.26\.[456789])\?recursive=1$/,
+        /\/git\/trees\/(v1\.26\.(?:[4-9]|10))\?recursive=1$/,
       );
       if (newReleaseTreeMatch) {
         return Response.json({
@@ -580,7 +602,8 @@ describe("getDeliveryVersions", () => {
               | "v1.26.6"
               | "v1.26.7"
               | "v1.26.8"
-              | "v1.26.9",
+              | "v1.26.9"
+              | "v1.26.10",
           ),
         });
       }
@@ -1242,14 +1265,16 @@ describe("getDeliveryVersions", () => {
     });
 
     const allVersions = await getDeliveryVersions(fetchMock as typeof fetch);
-    const priorVersions = allVersions.slice(3);
-    const versions = allVersions.slice(10);
+    const recentVersions = allVersions.slice(1);
+    const priorVersions = allVersions.slice(4);
+    const versions = allVersions.slice(11);
 
     expect(fetchMock).toHaveBeenCalledWith(
       "https://api.github.com/repos/yueyue27418/1688-autoprocurement/tags?per_page=100",
       expect.any(Object),
     );
     expect(allVersions.map((version) => version.tagName)).toEqual([
+      "v1.26.10",
       "v1.26.9",
       "v1.26.8",
       "v1.26.7",
@@ -1280,7 +1305,6 @@ describe("getDeliveryVersions", () => {
       "v1.15.1",
     ]);
     expect(allVersions[0]?.changelog.sections.map((section) => section.title)).toEqual([
-      "新增",
       "改进",
       "修复",
       "运维 / 配置",
@@ -1289,11 +1313,36 @@ describe("getDeliveryVersions", () => {
     expect(
       allVersions[0]?.changelog.sections.flatMap((section) => section.items),
     ).toEqual(expect.arrayContaining([
+      "批次管理的源文件、物料、搜索结果和联系记录汇总改为稳定分页读取，大批次可完整统计各阶段数量与源文件名称，不再受单次查询行数限制。",
+      "修复不同批次共用物料缓存导致页面切换后短暂显示上一批次或全量物料的问题，并补齐归档、取消归档后的缓存失效。",
+      "同步 v1.26.10 客户 `.env` 配置；安装器会在每次安装时通过受保护的部署环境变量刷新共享环境文件。",
+    ]));
+    expect(allVersions[0]).toMatchObject({
+      changelog: {
+        previousTagName: "v1.26.9",
+        sourceCommit: "dde6f8733fc8",
+        totals: {
+          added: 2,
+          modified: 14,
+          removed: 0,
+        },
+      },
+    });
+    expect(recentVersions[0]?.changelog.sections.map((section) => section.title)).toEqual([
+      "新增",
+      "改进",
+      "修复",
+      "运维 / 配置",
+      "迁移与兼容性提示",
+    ]);
+    expect(
+      recentVersions[0]?.changelog.sections.flatMap((section) => section.items),
+    ).toEqual(expect.arrayContaining([
       "Agent Search 新增原子停止控制：停止任务时会在同一数据库事务中撤销运行租约与全局并发许可、终止待处理项目，并返回需要关闭的 Hermes 远端运行清单。",
       "修复本地任务已进入失败或停止状态、但远端 Hermes 运行仍可能继续执行的问题；跨实例停止现在可从数据库恢复远端运行标识。",
       "同步 v1.26.9 客户 `.env` 配置；安装器会在每次安装时通过受保护的部署环境变量刷新共享环境文件。",
     ]));
-    expect(allVersions[0]).toMatchObject({
+    expect(recentVersions[0]).toMatchObject({
       changelog: {
         previousTagName: "v1.26.8",
         sourceCommit: "df400e764981",
@@ -1305,12 +1354,12 @@ describe("getDeliveryVersions", () => {
       },
     });
     expect(
-      allVersions[1]?.changelog.sections.flatMap((section) => section.items),
+      recentVersions[1]?.changelog.sections.flatMap((section) => section.items),
     ).toEqual(expect.arrayContaining([
       "演示视频的图片、语音、背景音乐和字体资源改由 Git LFS 管理，并清理渲染成品、缩略图、波形缓存和重复采集素材，降低交付仓库体积与拉取压力。",
       "补充演示媒体的 LFS 跟踪规则与生成物忽略规则；本版本未修改网站或自动化服务运行时代码。",
     ]));
-    expect(allVersions[1]).toMatchObject({
+    expect(recentVersions[1]).toMatchObject({
       changelog: {
         previousTagName: "v1.26.7",
         sourceCommit: "fde286030934",
@@ -1322,12 +1371,12 @@ describe("getDeliveryVersions", () => {
       },
     });
     expect(
-      allVersions[2]?.changelog.sections.flatMap((section) => section.items),
+      recentVersions[2]?.changelog.sections.flatMap((section) => section.items),
     ).toEqual(expect.arrayContaining([
       "自动化服务在持久化待处理数据回放期间新增受控只读模式：认证通过的 API GET/HEAD 请求可继续读取 Supabase 数据，写入请求仍保持关闭。",
       "修复归档运行时已就绪但 pending 健康数据缺失或过期时仍可能放行新任务的问题；未知健康状态现在会 fail closed。",
     ]));
-    expect(allVersions[2]).toMatchObject({
+    expect(recentVersions[2]).toMatchObject({
       changelog: {
         previousTagName: "v1.26.6",
         sourceCommit: "132c7d80de96",
